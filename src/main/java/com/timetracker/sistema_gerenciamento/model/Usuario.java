@@ -1,6 +1,12 @@
 package com.timetracker.sistema_gerenciamento.model;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,13 +20,13 @@ import jakarta.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "usuarios")
-public class Usuario {
+public class Usuario implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Nome é brigatdório")
+    @NotBlank(message = "Nome é obrigatório")
     private String nome;
 
     @Email
@@ -48,7 +54,7 @@ public class Usuario {
         this.perfil = perfil;
     }
 
-    // Métodos Getters e Setters
+    // Getters e Setters
     public Long getId() {
         return id;
     }
@@ -116,5 +122,42 @@ public class Usuario {
     // Método para atualizar o último login
     public void atualizarUltimoLogin() {
         this.ultimoLogin = LocalDateTime.now();
+    }
+
+    // Métodos da interface UserDetails
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(perfil)); // Retorna o perfil como uma role
+    }
+
+    @Override
+    public String getPassword() {
+        return senha;
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true; // Pode personalizar isso se precisar de expiração de conta
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true; // Pode personalizar para bloquear contas
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true; // Pode modificar caso tenha validade de senha
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true; // Pode personalizar para ativação de conta
     }
 }
