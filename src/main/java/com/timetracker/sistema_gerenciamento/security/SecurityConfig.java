@@ -45,8 +45,10 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()  // Login e cadastro abertos
                         .requestMatchers("/api/usuarios/cadastro").permitAll()
+                        .requestMatchers("/api/admin/**").hasAuthority("ADMIN") // Apenas ADMIN pode acessar
+                        .requestMatchers("/api/user/**").hasAuthority("USUARIO") // Apenas USUARIO pode acessar
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
