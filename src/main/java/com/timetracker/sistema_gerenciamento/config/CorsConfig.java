@@ -8,8 +8,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class CorsConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/api/**")
-                .allowedOrigins("http://localhost:4200")  // Permite requisições do frontend no Angular
+        registry.addMapping("/**")
+        .allowedOrigins("http://localhost:4200")  // Permite requisições do frontend no Angular
                 .allowedMethods("GET", "POST", "PUT", "DELETE")  // Métodos permitidos
                 .allowedHeaders("*");  // Cabeçalhos permitidos
     }

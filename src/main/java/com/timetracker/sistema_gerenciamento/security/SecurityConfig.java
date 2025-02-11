@@ -34,9 +34,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/login").permitAll()  // Libera login sem autenticação
-                        .requestMatchers("/api/usuarios/cadastro").permitAll()  // Libera cadastro sem autenticação
-                        .anyRequest().authenticated()  // Todas as outras rotas precisam de autenticação
+                        .anyRequest().permitAll() // Permite todas as rotas sem autenticação
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthEntryPoint))
