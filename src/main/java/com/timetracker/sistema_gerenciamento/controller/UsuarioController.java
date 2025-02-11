@@ -5,23 +5,42 @@ import com.timetracker.sistema_gerenciamento.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import java.util.HashMap;
+import java.util.Map;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 @RestController
 @RequestMapping("/api/usuarios")
+@CrossOrigin(origins = "http://localhost:4200")
 public class UsuarioController {
 
     @Autowired
     private UsuarioService usuarioService;
 
     @PostMapping("/cadastro")
-    public ResponseEntity<Usuario> cadastrarUsuario(@RequestBody Usuario usuario) {
-        Usuario novoUsuario = usuarioService.salvarUsuario(usuario);
-        return ResponseEntity.ok(novoUsuario);
-    }
+    public ResponseEntity<?> cadastrarUsuario(@RequestBody Usuario usuario) {
+        try {
+            if (usuarioService.buscarPorEmail(usuario.getEmail()) != null) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("message", "Email já cadastrado"));
+            }
 
-    @GetMapping("/buscar-email")
-    public ResponseEntity<Usuario> buscarPorEmail(@RequestParam String email) {
-        Usuario usuario = usuarioService.buscarPorEmail(email);
-        return ResponseEntity.ok(usuario);
+            Usuario novoUsuario = usuarioService.salvarUsuario(usuario);
+
+            // Criar um Map com apenas os dados necessários
+            Map<String, Object> response = new HashMap<>();
+            response.put("id", novoUsuario.getId());
+            response.put("nome", novoUsuario.getNome());
+            response.put("email", novoUsuario.getEmail());
+            response.put("perfil", novoUsuario.getPerfil());
+            response.put("message", "Usuário cadastrado com sucesso");
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Erro ao cadastrar usuário: " + e.getMessage()));
+        }
     }
 }

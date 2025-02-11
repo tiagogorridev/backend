@@ -18,13 +18,20 @@ public class UsuarioService {
 
     public Usuario salvarUsuario(Usuario usuario) {
         try {
+            // Define um perfil padrão se não foi especificado
+            if (usuario.getPerfil() == null || usuario.getPerfil().trim().isEmpty()) {
+                usuario.setPerfil("ROLE_USER");
+            }
+
+            // Codifica a senha
             usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
             return usuarioRepository.save(usuario);
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("Erro ao salvar o usuário", e);
+            throw new RuntimeException("Erro ao salvar o usuário: " + e.getMessage(), e);
         }
     }
+
 
     public Usuario buscarPorEmail(String email) {
         return usuarioRepository.findByEmail(email);

@@ -17,6 +17,7 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "usuarios")
@@ -126,38 +127,45 @@ public class Usuario implements UserDetails {
 
     // Métodos da interface UserDetails
 
+    @JsonIgnore
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(perfil)); // Retorna o perfil como uma role
+        return List.of(new SimpleGrantedAuthority(perfil != null ? perfil : "ROLE_USER"));
     }
 
+    @JsonIgnore
     @Override
     public String getPassword() {
         return senha;
     }
 
+    @JsonIgnore
     @Override
     public String getUsername() {
         return email;
     }
 
+    @JsonIgnore
     @Override
     public boolean isAccountNonExpired() {
-        return true; // Pode personalizar isso se precisar de expiração de conta
+        return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isAccountNonLocked() {
-        return true; // Pode personalizar para bloquear contas
+        return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isCredentialsNonExpired() {
-        return true; // Pode modificar caso tenha validade de senha
+        return true;
     }
 
+    @JsonIgnore
     @Override
     public boolean isEnabled() {
-        return true; // Pode personalizar para ativação de conta
+        return true;
     }
 }
