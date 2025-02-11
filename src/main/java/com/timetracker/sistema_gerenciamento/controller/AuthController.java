@@ -1,6 +1,8 @@
 package com.timetracker.sistema_gerenciamento.controller;
 
 import com.timetracker.sistema_gerenciamento.security.JwtUtil;
+import com.timetracker.sistema_gerenciamento.service.UsuarioService;
+import com.timetracker.sistema_gerenciamento.model.Usuario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -8,6 +10,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -15,61 +18,66 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
+@CrossOrigin(origins = "*") // Permite requisições de qualquer origem
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
     private final JwtUtil jwtUtil;
+    private final UsuarioService usuarioService;
 
     @Autowired
     public AuthController(AuthenticationManager authenticationManager,
                           UserDetailsService userDetailsService,
-                          JwtUtil jwtUtil) {
+                          JwtUtil jwtUtil,
+                          UsuarioService usuarioService) {
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
         this.jwtUtil = jwtUtil;
+        this.usuarioService = usuarioService;
     }
 
     @PostMapping("/login")
-    public Map<String, String> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequest request) {
         try {
-            System.out.println("Tentativa de login para email: " + request.getEmail());
+            String email = request.getEmail();
+            System.out.println("Tentativa de login para email: " + email);
 
-            // Tenta autenticar
-            UsernamePasswordAuthenticationToken authToken =
-                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getSenha());
+            if (email == null || email.trim().isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Email não pode estar vazio"));
+            }
 
-            System.out.println("Iniciando autenticação...");
-            authenticationManager.authenticate(authToken);
-            System.out.println("Autenticação bem sucedida");
+            Usuario usuario = usuarioService.buscarPorEmail(email);
+            if (usuario == null) {
+                System.out.println("Usuário não encontrado: " + email);
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Email não cadastrado no sistema"));
+            }
 
-            // Gera o token
-            UserDetails user = userDetailsService.loadUserByUsername(request.getEmail());
-            String token = jwtUtil.generateToken(user.getUsername());
+            try {
+                authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, request.getSenha()));
 
-            Map<String, String> response = new HashMap<>();
-            response.put("token", token);
-            return response;
-        } catch (BadCredentialsException e) {
-            System.out.println("Erro de autenticação: " + e.getMessage());
-            throw new UnauthorizedException("Credenciais inválidas");
+                UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+                String token = jwtUtil.generateToken(userDetails.getUsername());
+
+                Map<String, Object> response = new HashMap<>();
+                response.put("token", token);
+                response.put("message", "Login realizado com sucesso");
+                response.put("statusCode", HttpStatus.OK.value());
+
+                return ResponseEntity.ok(response);
+
+            } catch (BadCredentialsException e) {
+                System.out.println("Senha incorreta: " + email);
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Senha incorreta"));
+            }
+
         } catch (Exception e) {
             System.out.println("Erro inesperado: " + e.getMessage());
             e.printStackTrace();
-            throw new UnauthorizedException("Erro na autenticação");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Erro interno na autenticação"));
         }
     }
 
-    // Captura global de exceções para retornar 401 ao invés de 500
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ExceptionHandler(UnauthorizedException.class)
-    public Map<String, String> handleUnauthorizedException(UnauthorizedException e) {
-        Map<String, String> errorResponse = new HashMap<>();
-        errorResponse.put("error", e.getMessage());
-        return errorResponse;
-    }
-
-    // Classe auxiliar para receber o JSON no corpo da requisição
     public static class LoginRequest {
         private String email;
         private String senha;
@@ -79,12 +87,5 @@ public class AuthController {
 
         public String getSenha() { return senha; }
         public void setSenha(String senha) { this.senha = senha; }
-    }
-
-    // Exceção personalizada para controle de erro
-    public static class UnauthorizedException extends RuntimeException {
-        public UnauthorizedException(String message) {
-            super(message);
-        }
     }
 }
