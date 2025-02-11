@@ -6,12 +6,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final UsuarioRepository usuarioRepository;
 
+    @Autowired
     public CustomUserDetailsService(UsuarioRepository usuarioRepository) {
         this.usuarioRepository = usuarioRepository;
     }
@@ -22,6 +24,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         if (usuario == null) {
             throw new UsernameNotFoundException("Usuário não encontrado com o email: " + email);
         }
-        return new CustomUserDetails(usuario);
+        return usuario; // Como Usuario já implementa UserDetails, podemos retorná-lo diretamente
     }
 }

@@ -18,7 +18,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "*") // Permite requisições de qualquer origem
+@CrossOrigin(origins = "http://localhost:4200")
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
@@ -38,53 +38,43 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
-            String email = request.getEmail();
-            System.out.println("Tentativa de login para email: " + email);
+            System.out.println("Tentativa de login para: " + request.getEmail());
 
-            if (email == null || email.trim().isEmpty()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Email não pode estar vazio"));
-            }
+            // Autenticação do usuário
+            UsernamePasswordAuthenticationToken authenticationToken =
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getSenha());
+            authenticationManager.authenticate(authenticationToken);
 
-            Usuario usuario = usuarioService.buscarPorEmail(email);
-            if (usuario == null) {
-                System.out.println("Usuário não encontrado: " + email);
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Email não cadastrado no sistema"));
-            }
+            // Recuperar detalhes do usuário
+            UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
 
-            try {
-                authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, request.getSenha()));
+            // Gerar o token JWT usando o nome de usuário
+            String token = jwtUtil.generateToken(userDetails.getUsername());
 
-                UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-                String token = jwtUtil.generateToken(userDetails.getUsername());
+            // Retornar resposta com token JWT
+            return ResponseEntity.ok(Map.of("message", "Login bem-sucedido", "token", token));
 
-                Map<String, Object> response = new HashMap<>();
-                response.put("token", token);
-                response.put("message", "Login realizado com sucesso");
-                response.put("statusCode", HttpStatus.OK.value());
-
-                return ResponseEntity.ok(response);
-
-            } catch (BadCredentialsException e) {
-                System.out.println("Senha incorreta: " + email);
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Senha incorreta"));
-            }
-
-        } catch (Exception e) {
-            System.out.println("Erro inesperado: " + e.getMessage());
+        } catch (BadCredentialsException e) {
+            System.out.println("Credenciais inválidas para: " + request.getEmail());
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Erro interno na autenticação"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Credenciais inválidas"));
+        } catch (Exception e) {
+            System.out.println("Erro inesperado no login: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Erro ao realizar login: " + e.getMessage()));
         }
     }
-
     public static class LoginRequest {
         private String email;
         private String senha;
 
+        // Getters e Setters
         public String getEmail() { return email; }
         public void setEmail(String email) { this.email = email; }
-
         public String getSenha() { return senha; }
         public void setSenha(String senha) { this.senha = senha; }
     }
