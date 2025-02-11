@@ -2,25 +2,55 @@ package com.timetracker.sistema_gerenciamento.service;
 
 import com.timetracker.sistema_gerenciamento.model.Usuario;
 import com.timetracker.sistema_gerenciamento.repository.UsuarioRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UsuarioService {
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+    private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
+        this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     public Usuario salvarUsuario(Usuario usuario) {
         try {
-            return usuarioRepository.save(usuario); // Salva o usuário no banco de dados
+            usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
+            return usuarioRepository.save(usuario);
         } catch (Exception e) {
-            e.printStackTrace(); // Imprime o erro no log
-            throw new RuntimeException("Erro ao salvar o usuário", e); // Lança uma exceção para ser tratada pelo controlador
+            e.printStackTrace();
+            throw new RuntimeException("Erro ao salvar o usuário", e);
         }
     }
 
     public Usuario buscarPorEmail(String email) {
         return usuarioRepository.findByEmail(email);
+    }
+
+    public boolean verificarCredenciais(String email, String senhaDigitada) {
+        Usuario usuario = buscarPorEmail(email);
+        if (usuario == null) {
+            System.out.println("Usuário não encontrado.");
+            return false;
+        }
+
+        boolean senhaCorreta = passwordEncoder.matches(senhaDigitada, usuario.getSenha());
+        System.out.println("Usuário encontrado: " + email);
+        System.out.println("Senha correta? " + senhaCorreta);
+        return senhaCorreta;
+    }
+
+    public void verificarUsuario(String email) {
+        Usuario usuario = buscarPorEmail(email);
+        if (usuario != null) {
+            System.out.println("Usuário encontrado no banco:");
+            System.out.println("Email: " + usuario.getEmail());
+            System.out.println("Senha hash: " + usuario.getSenha());
+        } else {
+            System.out.println("Usuário não encontrado no banco!");
+        }
     }
 }
