@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.timetracker.sistema_gerenciamento.repository.ProjetoRepository;
 import com.timetracker.sistema_gerenciamento.model.Projeto;
 
+import java.util.List;
+
 @Service
 public class ProjetoService {
 
@@ -13,5 +15,9 @@ public class ProjetoService {
 
     public Projeto save(Projeto projeto) {
         return projetoRepository.save(projeto);
+    }
+
+    public List<Projeto> findProjetosByUsuario(Long idUsuario) {
+        return projetoRepository.findByUsuarioResponsavelId(idUsuario);
     }
 }
