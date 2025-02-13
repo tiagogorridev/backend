@@ -1,6 +1,8 @@
 package com.timetracker.sistema_gerenciamento.model;
 
-import jakarta.persistence.*;import java.util.Date;
+import jakarta.persistence.*;
+import java.math.BigDecimal;
+import java.util.Date;
 
 @Entity
 @Table(name = "projetos")  // Este é o nome da tabela no banco de dados
@@ -12,6 +14,12 @@ public class Projeto {
 
     private String nome;
     private String descricao;
+
+    @Column(name = "horas_estimadas")
+    private BigDecimal horasEstimadas;  // Alterado para BigDecimal
+
+    @Column(name = "custo_estimado")
+    private BigDecimal custoEstimado;
 
     @Temporal(TemporalType.DATE)  // Especificando que a data deve ser tratada como Date
     private Date dataInicio;
@@ -53,6 +61,22 @@ public class Projeto {
 
     public void setDescricao(String descricao) {
         this.descricao = descricao;
+    }
+
+    public BigDecimal getHorasEstimadas() {
+        return horasEstimadas;
+    }
+
+    public void setHorasEstimadas(BigDecimal horasEstimadas) {
+        this.horasEstimadas = horasEstimadas;
+    }
+
+    public BigDecimal getCustoEstimado() {
+        return custoEstimado;
+    }
+
+    public void setCustoEstimado(BigDecimal custoEstimado) {
+        this.custoEstimado = custoEstimado;
     }
 
     public Date getDataInicio() {
