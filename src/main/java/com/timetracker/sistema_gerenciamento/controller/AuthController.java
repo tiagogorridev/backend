@@ -58,6 +58,7 @@ public class AuthController {
 
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Login bem-sucedido");
+            response.put("id", usuario.getId());  // Adiciona o ID
             response.put("token", token);
             response.put("perfil", usuario.getPerfil());
 
