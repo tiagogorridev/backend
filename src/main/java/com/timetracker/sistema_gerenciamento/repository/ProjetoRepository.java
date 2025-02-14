@@ -13,5 +13,5 @@ public interface ProjetoRepository extends JpaRepository<Projeto, Long> {
     List<Projeto> findByUsuarioResponsavelId(Long usuarioId);
 
     @Query("SELECT p FROM Projeto p JOIN FETCH p.cliente")
-    List<Projeto> findAllWithClientes();  // Busca todos os projetos com os clientes associados
+    List<Projeto> findAllWithClientes();
 }

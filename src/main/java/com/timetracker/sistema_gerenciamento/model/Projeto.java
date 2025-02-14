@@ -1,11 +1,12 @@
 package com.timetracker.sistema_gerenciamento.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
-@Table(name = "projetos")  // Este é o nome da tabela no banco de dados
+@Table(name = "projetos")
 public class Projeto {
 
     @Id
@@ -16,15 +17,15 @@ public class Projeto {
     private String descricao;
 
     @Column(name = "horas_estimadas")
-    private BigDecimal horasEstimadas;  // Alterado para BigDecimal
+    private BigDecimal horasEstimadas;
 
     @Column(name = "custo_estimado")
     private BigDecimal custoEstimado;
 
-    @Temporal(TemporalType.DATE)  // Especificando que a data deve ser tratada como Date
+    @Temporal(TemporalType.DATE)
     private Date dataInicio;
 
-    @Temporal(TemporalType.DATE)  // Especificando que a data deve ser tratada como Date
+    @Temporal(TemporalType.DATE)
     private Date dataFim;
 
     @Enumerated(EnumType.STRING)
@@ -37,8 +38,12 @@ public class Projeto {
     @JoinColumn(name = "id_usuario_responsavel")
     private Usuario usuarioResponsavel;
 
-    // Getters e Setters
+    @ManyToOne
+    @JoinColumn(name = "id_cliente", referencedColumnName = "id", nullable = false)
+    @JsonBackReference
+    private Cliente cliente;
 
+    // Getters e Setters
     public Long getId() {
         return id;
     }
@@ -117,5 +122,13 @@ public class Projeto {
 
     public void setUsuarioResponsavel(Usuario usuarioResponsavel) {
         this.usuarioResponsavel = usuarioResponsavel;
+    }
+
+    public Cliente getCliente() {
+        return cliente;
+    }
+
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente;
     }
 }
