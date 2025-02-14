@@ -1,9 +1,11 @@
 package com.timetracker.sistema_gerenciamento.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+
+import java.util.Set;
 
 @Entity
 @Table(name = "clientes")
@@ -25,6 +27,17 @@ public class Cliente {
 
     @Column(name = "status", nullable = false, columnDefinition = "ENUM('ATIVO', 'INATIVO') DEFAULT 'ATIVO'")
     private String status = "ATIVO";
+
+    @OneToMany(mappedBy = "cliente")
+    @JsonManagedReference
+    private Set<Projeto> projetos;
+
+    public Cliente() {
+    }
+
+    public Cliente(Long id) {
+        this.id = id;
+    }
 
     // Getters e setters
     public Long getId() {
@@ -57,5 +70,13 @@ public class Cliente {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Set<Projeto> getProjetos() {
+        return projetos;
+    }
+
+    public void setProjetos(Set<Projeto> projetos) {
+        this.projetos = projetos;
     }
 }
