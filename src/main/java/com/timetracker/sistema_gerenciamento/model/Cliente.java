@@ -13,15 +13,18 @@ public class Cliente {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "nome_cliente", nullable = false)
+    @Column(name = "nome", nullable = false)
     @NotNull
     @NotEmpty(message = "O nome do cliente não pode ser nulo ou vazio")
-    private String nomeCliente;
+    private String nome;
 
-    @Column(name = "email_cliente", nullable = false, unique = true)
+    @Column(name = "email", nullable = false, unique = true)
     @NotNull
     @NotEmpty(message = "O email do cliente não pode ser nulo ou vazio")
-    private String emailCliente;
+    private String email;
+
+    @Column(name = "status", nullable = false, columnDefinition = "ENUM('ATIVO', 'INATIVO') DEFAULT 'ATIVO'")
+    private String status = "ATIVO";
 
     // Getters e setters
     public Long getId() {
@@ -32,19 +35,27 @@ public class Cliente {
         this.id = id;
     }
 
-    public String getNomeCliente() {
-        return nomeCliente;
+    public String getNome() {
+        return nome;
     }
 
-    public void setNomeCliente(String nomeCliente) {
-        this.nomeCliente = nomeCliente;
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
-    public String getEmailCliente() {
-        return emailCliente;
+    public String getEmail() {
+        return email;
     }
 
-    public void setEmailCliente(String emailCliente) {
-        this.emailCliente = emailCliente;
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }
