@@ -18,6 +18,10 @@ public class ProjetoService {
     }
 
     public List<Projeto> getProjetosPorUsuario(Long idUsuario) {
-        return projetoRepository.findByUsuarioResponsavelId(idUsuario);  // Alterar aqui
+        return projetoRepository.findByUsuarioResponsavelId(idUsuario);
+    }
+
+    public List<Projeto> getTodosProjetosComClientes() {
+        return projetoRepository.findAllWithClientes(); // Retorna projetos já com os clientes
     }
 }
