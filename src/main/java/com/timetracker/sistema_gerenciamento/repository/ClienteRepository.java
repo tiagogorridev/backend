@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ClienteRepository extends JpaRepository<Cliente, Long> {
-    Cliente findByEmailCliente(String email);
+    Cliente findByEmail(String email);
 }
