@@ -17,7 +17,7 @@ public class ProjetoService {
         return projetoRepository.save(projeto);
     }
 
-    public List<Projeto> findProjetosByUsuario(Long idUsuario) {
-        return projetoRepository.findByUsuarioResponsavelId(idUsuario);
+    public List<Projeto> getProjetosPorUsuario(Long idUsuario) {
+        return projetoRepository.findByUsuarioResponsavelId(idUsuario);  // Alterar aqui
     }
 }

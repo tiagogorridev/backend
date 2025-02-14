@@ -2,6 +2,7 @@ package com.timetracker.sistema_gerenciamento.controller;
 
 import com.timetracker.sistema_gerenciamento.model.Usuario;
 import com.timetracker.sistema_gerenciamento.repository.UsuarioRepository; // Importe o repositório de usuários
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +36,9 @@ public class ProjetoController {
         return projetoService.save(projeto);
     }
 
-    @GetMapping("/usuario/{idUsuario}")
-    public List<Projeto> getProjetosPorUsuario(@PathVariable Long idUsuario) {
-        return projetoService.findProjetosByUsuario(idUsuario);
+    @GetMapping("/usuario/{usuarioId}")
+    public ResponseEntity<List<Projeto>> getProjetosDoUsuario(@PathVariable Long usuarioId) {
+        List<Projeto> projetos = projetoService.getProjetosPorUsuario(usuarioId);
+        return ResponseEntity.ok(projetos);
     }
 }
