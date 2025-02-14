@@ -61,7 +61,9 @@ public class AuthController {
             response.put("id", usuario.getId());  // Adiciona o ID
             response.put("token", token);
             response.put("perfil", usuario.getPerfil());
-
+            System.out.println("email logado: " + request.getEmail());
+            System.out.println("token logado: " + token);
+            System.out.println("id logado: " + usuario.getId());
             return ResponseEntity.ok(response);
 
         } catch (BadCredentialsException e) {
