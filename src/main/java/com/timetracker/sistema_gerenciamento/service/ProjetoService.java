@@ -22,6 +22,22 @@ public class ProjetoService {
     }
 
     public List<Projeto> getTodosProjetosComClientes() {
-        return projetoRepository.findAllWithClientes(); // Retorna projetos já com os clientes
+        return projetoRepository.findAllWithClientes();
+    }
+
+    public Projeto atualizarProjeto(Long id, Projeto projetoDetails) {
+        Projeto projetoExistente = projetoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Projeto não encontrado"));
+
+        projetoExistente.setNome(projetoDetails.getNome());
+        projetoExistente.setCliente(projetoDetails.getCliente());
+        projetoExistente.setHorasEstimadas(projetoDetails.getHorasEstimadas());
+        projetoExistente.setCustoEstimado(projetoDetails.getCustoEstimado());
+
+        return projetoRepository.save(projetoExistente);
+    }
+
+    public Projeto getProjetoById(Long id) {
+        return projetoRepository.findById(id).orElse(null);
     }
 }
