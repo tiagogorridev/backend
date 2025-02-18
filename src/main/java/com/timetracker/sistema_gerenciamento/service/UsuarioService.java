@@ -6,6 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UsuarioService {
@@ -33,7 +34,6 @@ public class UsuarioService {
             throw new RuntimeException("Erro ao salvar o usuário: " + e.getMessage(), e);
         }
     }
-
 
     public Usuario buscarPorEmail(String email) {
         return usuarioRepository.findByEmail(email);
@@ -63,8 +63,15 @@ public class UsuarioService {
         }
     }
 
-
     public List<Usuario> listarTodosUsuarios() {
         return usuarioRepository.findAll();
+    }
+
+    // Novo método para retornar todos os e-mails dos usuários
+    public List<String> getEmails() {
+        List<Usuario> usuarios = usuarioRepository.findAll();
+        return usuarios.stream()
+                .map(Usuario::getEmail)
+                .collect(Collectors.toList());
     }
 }
