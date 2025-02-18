@@ -6,6 +6,7 @@ import com.timetracker.sistema_gerenciamento.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -25,6 +26,7 @@ public class UsuarioController {
         List<Usuario> usuarios = usuarioService.listarTodosUsuarios();
         return ResponseEntity.ok(usuarios);
     }
+
     @PostMapping("/cadastro")
     public ResponseEntity<?> cadastrarUsuario(@RequestBody Usuario usuario) {
         try {
@@ -51,5 +53,11 @@ public class UsuarioController {
         }
     }
 
-
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @GetMapping("/emails")
+    public ResponseEntity<?> getEmails() {
+        // Seu código para buscar os e-mails
+        List<String> emails = usuarioService.getEmails();
+        return ResponseEntity.ok(emails);
+    }
 }
