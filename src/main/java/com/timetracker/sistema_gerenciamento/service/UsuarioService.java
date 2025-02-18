@@ -5,6 +5,8 @@ import com.timetracker.sistema_gerenciamento.repository.UsuarioRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UsuarioService {
 
@@ -59,5 +61,10 @@ public class UsuarioService {
         } else {
             System.out.println("Usuário não encontrado no banco!");
         }
+    }
+
+
+    public List<Usuario> listarTodosUsuarios() {
+        return usuarioRepository.findAll();
     }
 }

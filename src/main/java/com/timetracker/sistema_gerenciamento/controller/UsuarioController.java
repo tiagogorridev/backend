@@ -1,5 +1,6 @@
 package com.timetracker.sistema_gerenciamento.controller;
 
+import com.timetracker.sistema_gerenciamento.model.Cliente;
 import com.timetracker.sistema_gerenciamento.model.Usuario;
 import com.timetracker.sistema_gerenciamento.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -18,6 +20,11 @@ public class UsuarioController {
     @Autowired
     private UsuarioService usuarioService;
 
+    @GetMapping
+    public ResponseEntity<List<Usuario>> listarTodosUsuarios() {
+        List<Usuario> usuarios = usuarioService.listarTodosUsuarios();
+        return ResponseEntity.ok(usuarios);
+    }
     @PostMapping("/cadastro")
     public ResponseEntity<?> cadastrarUsuario(@RequestBody Usuario usuario) {
         try {
@@ -43,4 +50,6 @@ public class UsuarioController {
                     .body(Map.of("message", "Erro ao cadastrar usuário: " + e.getMessage()));
         }
     }
+
+
 }
