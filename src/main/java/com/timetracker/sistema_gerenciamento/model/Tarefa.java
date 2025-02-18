@@ -14,6 +14,7 @@ public class Tarefa {
 
     private String nome;
     private String descricao;
+
     private LocalDate dataInicio;
     private LocalDate dataFim;
 

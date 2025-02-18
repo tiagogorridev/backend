@@ -3,7 +3,9 @@ package com.timetracker.sistema_gerenciamento.model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "projetos")
@@ -14,6 +16,10 @@ public class Projeto {
     private Long id;
 
     private String nome;
+
+    @OneToMany(mappedBy = "projeto")
+    private List<Tarefa> tarefas = new ArrayList<>();
+
     private String descricao;
 
     @Column(name = "horas_estimadas")

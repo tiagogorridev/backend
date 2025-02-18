@@ -2,38 +2,53 @@ package com.timetracker.sistema_gerenciamento.controller;
 
 import com.timetracker.sistema_gerenciamento.model.ResourceNotFoundException;
 import com.timetracker.sistema_gerenciamento.model.Tarefa;
-import com.timetracker.sistema_gerenciamento.model.Projeto;  // Importando a classe Projeto
-import com.timetracker.sistema_gerenciamento.repository.TarefaRepository;
-import com.timetracker.sistema_gerenciamento.repository.ProjetoRepository;  // Importando o repositório de Projeto
+import com.timetracker.sistema_gerenciamento.model.Projeto;
+import com.timetracker.sistema_gerenciamento.service.TarefaService;
+import com.timetracker.sistema_gerenciamento.repository.ProjetoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/tarefas")
 public class TarefaController {
 
     @Autowired
-    private TarefaRepository tarefaRepository;
+    private TarefaService tarefaService;
 
     @Autowired
-    private ProjetoRepository projetoRepository;  // Repositório de Projeto para buscar o projeto
+    private ProjetoRepository projetoRepository;
+
+    @GetMapping
+    public ResponseEntity<List<Tarefa>> listarTodasTarefas() {
+        List<Tarefa> tarefas = tarefaService.listarTodasTarefas();
+        return ResponseEntity.ok(tarefas);
+    }
+
+    @GetMapping("/projeto/{projetoId}")
+    public ResponseEntity<List<Tarefa>> listarTarefasPorProjeto(@PathVariable Long projetoId) {
+        if (!projetoRepository.existsById(projetoId)) {
+            throw new ResourceNotFoundException("Projeto não encontrado");
+        }
+        List<Tarefa> tarefas = tarefaService.listarTarefasPorProjeto(projetoId);
+        return ResponseEntity.ok(tarefas);
+    }
 
     @PostMapping
     public ResponseEntity<Tarefa> createTarefa(@RequestBody Tarefa tarefa) {
-        // Buscando o projeto usando o ID passado na tarefa
+        if (tarefa.getProjeto() == null || tarefa.getProjeto().getId() == null) {
+            throw new IllegalArgumentException("Projeto não pode ser nulo");
+        }
+
         Projeto projeto = projetoRepository.findById(tarefa.getProjeto().getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Projeto não encontrado"));
 
-        // Associando o projeto à tarefa
         tarefa.setProjeto(projeto);
 
-        // Salvando a tarefa com o projeto associado
-        Tarefa novaTarefa = tarefaRepository.save(tarefa);
+        Tarefa novaTarefa = tarefaService.salvarTarefa(tarefa);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(novaTarefa);
     }
