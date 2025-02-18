@@ -1,9 +1,8 @@
 package com.timetracker.sistema_gerenciamento.model;
 
 public enum Status {
-    PLANEJADO,  // Adicionando o valor "PLANEJADO"
+    PLANEJADO,
     EM_ANDAMENTO,
-    INICIADO,
-    PAUSADO,
-    CONCLUÍDO
+    CONCLUIDO,
+    CANCELADO
 }

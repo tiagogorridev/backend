@@ -52,6 +52,15 @@ public class ProjetoController {
             existingProjeto.setCustoEstimado(projeto.getCustoEstimado());
         }
 
+        // Add these blocks to handle status and priority
+        if (projeto.getStatus() != null) {
+            existingProjeto.setStatus(projeto.getStatus());
+        }
+
+        if (projeto.getPrioridade() != null) {
+            existingProjeto.setPrioridade(projeto.getPrioridade());
+        }
+
         projetoService.save(existingProjeto);
         return ResponseEntity.ok(existingProjeto);
     }
