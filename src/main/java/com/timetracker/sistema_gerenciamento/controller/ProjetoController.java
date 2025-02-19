@@ -38,10 +38,9 @@ public class ProjetoController {
             existingProjeto.setNome(projeto.getNome());
         }
 
+        // Ignorar a atualização do cliente
         if (projeto.getCliente() != null && projeto.getCliente().getId() != null) {
-            Cliente cliente = clienteRepository.findById(projeto.getCliente().getId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado"));
-            existingProjeto.setCliente(cliente);
+            // Não fazemos nada aqui, para garantir que o cliente não seja alterado
         }
 
         if (projeto.getHorasEstimadas() != null) {
@@ -52,7 +51,7 @@ public class ProjetoController {
             existingProjeto.setCustoEstimado(projeto.getCustoEstimado());
         }
 
-        // Add these blocks to handle status and priority
+        // Adicionar esses blocos para lidar com status e prioridade
         if (projeto.getStatus() != null) {
             existingProjeto.setStatus(projeto.getStatus());
         }
@@ -64,7 +63,6 @@ public class ProjetoController {
         projetoService.save(existingProjeto);
         return ResponseEntity.ok(existingProjeto);
     }
-
     @PostMapping
     public Projeto createProjeto(@RequestBody Projeto projeto) {
         Long usuarioId = projeto.getUsuarioResponsavel().getId();
