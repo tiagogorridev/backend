@@ -1,6 +1,6 @@
 package com.timetracker.sistema_gerenciamento.controller;
 
-import com.timetracker.sistema_gerenciamento.model.Cliente;
+import com.timetracker.sistema_gerenciamento.exception.UsuarioNaoEncontradoException;
 import com.timetracker.sistema_gerenciamento.model.Usuario;
 import com.timetracker.sistema_gerenciamento.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,14 +30,16 @@ public class UsuarioController {
     @PostMapping("/cadastro")
     public ResponseEntity<?> cadastrarUsuario(@RequestBody Usuario usuario) {
         try {
+            // Verifica se o e-mail já está cadastrado
             if (usuarioService.buscarPorEmail(usuario.getEmail()) != null) {
                 return ResponseEntity.badRequest()
                         .body(Map.of("message", "Email já cadastrado"));
             }
 
+            // Salva o novo usuário
             Usuario novoUsuario = usuarioService.salvarUsuario(usuario);
 
-            // Criar um Map com apenas os dados necessários
+            // Cria um Map com os dados necessários do novo usuário
             Map<String, Object> response = new HashMap<>();
             response.put("id", novoUsuario.getId());
             response.put("nome", novoUsuario.getNome());
@@ -45,7 +47,8 @@ public class UsuarioController {
             response.put("perfil", novoUsuario.getPerfil());
             response.put("message", "Usuário cadastrado com sucesso");
 
-            return ResponseEntity.ok(response);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response); // Retorna o status 201
+
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -55,9 +58,35 @@ public class UsuarioController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/emails")
-    public ResponseEntity<?> getEmails() {
-        // Seu código para buscar os e-mails
+    public ResponseEntity<List<String>> getEmails() {
+        // Busca todos os e-mails dos usuários
         List<String> emails = usuarioService.getEmails();
         return ResponseEntity.ok(emails);
+    }
+
+    @PutMapping("/usuarios/{id}")
+    public ResponseEntity<?> atualizarUsuario(@PathVariable Long id, @RequestBody Usuario usuarioAtualizado) {
+        try {
+            Usuario usuario = usuarioService.atualizarUsuario(id, usuarioAtualizado);
+            return ResponseEntity.ok(usuario);
+        } catch (UsuarioNaoEncontradoException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Erro ao atualizar usuário: " + e.getMessage()));
+        }
+    }
+
+    @GetMapping("/usuarios/{id}")
+    public ResponseEntity<?> getUsuarioById(@PathVariable Long id) {
+        try {
+            Usuario usuario = usuarioService.buscarPorId(id)
+                    .orElseThrow(() -> new UsuarioNaoEncontradoException(id));
+            return ResponseEntity.ok(usuario);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Erro ao buscar usuário: " + e.getMessage()));
+        }
     }
 }
