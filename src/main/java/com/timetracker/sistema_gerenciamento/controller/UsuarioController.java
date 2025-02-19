@@ -65,12 +65,33 @@ public class UsuarioController {
     }
 
     @PutMapping("/usuarios/{id}")
-    public ResponseEntity<?> atualizarUsuario(@PathVariable Long id, @RequestBody Usuario usuarioAtualizado) {
+    public ResponseEntity<?> atualizarUsuario(
+            @PathVariable Long id,
+            @RequestBody Map<String, Object> requestBody
+    ) {
         try {
-            Usuario usuario = usuarioService.atualizarUsuario(id, usuarioAtualizado);
+            Usuario usuarioAtualizado = new Usuario();
+
+            // Extrair dados do requestBody
+            if (requestBody.get("nome") != null) {
+                usuarioAtualizado.setNome((String) requestBody.get("nome"));
+            }
+            if (requestBody.get("email") != null) {
+                usuarioAtualizado.setEmail((String) requestBody.get("email"));
+            }
+            if (requestBody.get("perfil") != null) {
+                usuarioAtualizado.setPerfil((String) requestBody.get("perfil"));
+            }
+            if (requestBody.get("senha") != null) {
+                usuarioAtualizado.setSenha((String) requestBody.get("senha"));
+            }
+
+            String senhaAtual = (String) requestBody.get("senhaAtual");
+
+            Usuario usuario = usuarioService.atualizarUsuario(id, usuarioAtualizado, senhaAtual);
             return ResponseEntity.ok(usuario);
-        } catch (UsuarioNaoEncontradoException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest()
                     .body(Map.of("message", e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -87,6 +108,17 @@ public class UsuarioController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Erro ao buscar usuário: " + e.getMessage()));
+        }
+    }
+
+    @PostMapping("/usuarios/{id}/verify-password")
+    public ResponseEntity<?> verificarSenhaAtual(@PathVariable Long id, @RequestBody Map<String, String> credentials) {
+        try {
+            boolean senhaCorreta = usuarioService.verificarSenhaAtual(id, credentials.get("senha"));
+            return ResponseEntity.ok(Map.of("valid", senhaCorreta));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Erro ao verificar senha: " + e.getMessage()));
         }
     }
 }

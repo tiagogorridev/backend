@@ -64,14 +64,36 @@ public class UsuarioService {
                 .collect(Collectors.toList());
     }
 
-    public Usuario atualizarUsuario(Long id, Usuario usuarioAtualizado) {
+    public Usuario atualizarUsuario(Long id, Usuario usuarioAtualizado, String senhaAtual) {
         Usuario usuarioExistente = usuarioRepository.findById(id)
                 .orElseThrow(() -> new UsuarioNaoEncontradoException(id));
 
-        usuarioExistente.setNome(usuarioAtualizado.getNome());
-        usuarioExistente.setEmail(usuarioAtualizado.getEmail());
-        usuarioExistente.setPerfil(usuarioAtualizado.getPerfil());
+        // Se está tentando atualizar a senha, verifica a senha atual primeiro
+        if (usuarioAtualizado.getSenha() != null && !usuarioAtualizado.getSenha().isEmpty()) {
+            if (senhaAtual == null || !passwordEncoder.matches(senhaAtual, usuarioExistente.getSenha())) {
+                throw new RuntimeException("Senha atual incorreta");
+            }
+            usuarioExistente.setSenha(passwordEncoder.encode(usuarioAtualizado.getSenha()));
+        }
+
+        // Atualiza outros campos se necessário
+        if (usuarioAtualizado.getNome() != null) {
+            usuarioExistente.setNome(usuarioAtualizado.getNome());
+        }
+        if (usuarioAtualizado.getEmail() != null) {
+            usuarioExistente.setEmail(usuarioAtualizado.getEmail());
+        }
+        if (usuarioAtualizado.getPerfil() != null) {
+            usuarioExistente.setPerfil(usuarioAtualizado.getPerfil());
+        }
 
         return usuarioRepository.save(usuarioExistente);
+    }
+
+    public boolean verificarSenhaAtual(Long id, String senhaAtual) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new UsuarioNaoEncontradoException(id));
+
+        return passwordEncoder.matches(senhaAtual, usuario.getSenha());
     }
 }
