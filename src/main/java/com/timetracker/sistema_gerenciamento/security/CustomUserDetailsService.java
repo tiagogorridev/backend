@@ -5,8 +5,8 @@ import com.timetracker.sistema_gerenciamento.repository.UsuarioRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -24,6 +24,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         if (usuario == null) {
             throw new UsernameNotFoundException("Usuário não encontrado com o email: " + email);
         }
-        return usuario; // Como Usuario já implementa UserDetails, podemos retorná-lo diretamente
+        return usuario;
     }
 }

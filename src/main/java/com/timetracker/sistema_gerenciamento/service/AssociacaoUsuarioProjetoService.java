@@ -15,31 +15,30 @@ import java.time.LocalDateTime;
 public class AssociacaoUsuarioProjetoService {
 
     @Autowired
-    private UsuarioRepository usuarioRepository;  // Repositório de usuários
+    private UsuarioRepository usuarioRepository;
+
     @Autowired
-    private ProjetoRepository projetoRepository;  // Repositório de projetos
+    private ProjetoRepository projetoRepository;
+
     @Autowired
-    private UsuariosProjetosRepository usuariosProjetosRepository;  // Repositório de associação
+    private UsuariosProjetosRepository usuariosProjetosRepository;
 
     public void associarUsuarioAoProjeto(Long idUsuario, Long idProjeto) {
-        // Verifica se o usuário e o projeto existem
         Usuario usuario = usuarioRepository.findById(idUsuario)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
         Projeto projeto = projetoRepository.findById(idProjeto)
                 .orElseThrow(() -> new RuntimeException("Projeto não encontrado"));
 
-        // Verifica se a associação já existe
         if (usuariosProjetosRepository.existsByIdUsuarioAndIdProjeto(idUsuario, idProjeto)) {
             throw new RuntimeException("O usuário já está associado a este projeto");
         }
 
-        // Cria a associação entre usuário e projeto
         UsuariosProjetos associacao = new UsuariosProjetos();
         associacao.setIdUsuario(idUsuario);
         associacao.setIdProjeto(idProjeto);
         associacao.setDataAssociacao(LocalDateTime.now());
 
-        // Salva a associação
         usuariosProjetosRepository.save(associacao);
     }
 }

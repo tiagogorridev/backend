@@ -23,12 +23,9 @@ public class UsuarioService {
 
     public Usuario salvarUsuario(Usuario usuario) {
         try {
-            // Define um perfil padrão se não foi especificado
             if (usuario.getPerfil() == null || usuario.getPerfil().trim().isEmpty()) {
                 usuario.setPerfil("ROLE_USER");
             }
-
-            // Codifica a senha
             usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
             return usuarioRepository.save(usuario);
         } catch (Exception e) {
@@ -37,7 +34,7 @@ public class UsuarioService {
     }
 
     public Usuario buscarPorEmail(String email) {
-        return usuarioRepository.findByEmail(email); // Retorna diretamente o usuário ou null
+        return usuarioRepository.findByEmail(email);
     }
 
     public Optional<Usuario> buscarPorId(Long id) {
@@ -47,9 +44,8 @@ public class UsuarioService {
     public boolean verificarCredenciais(String email, String senhaDigitada) {
         Usuario usuario = buscarPorEmail(email);
         if (usuario == null) {
-            return false; // Usuário não encontrado
+            return false;
         }
-
         return passwordEncoder.matches(senhaDigitada, usuario.getSenha());
     }
 
@@ -58,8 +54,7 @@ public class UsuarioService {
     }
 
     public List<String> getEmails() {
-        List<Usuario> usuarios = usuarioRepository.findAll();
-        return usuarios.stream()
+        return usuarioRepository.findAll().stream()
                 .map(Usuario::getEmail)
                 .collect(Collectors.toList());
     }
@@ -68,7 +63,6 @@ public class UsuarioService {
         Usuario usuarioExistente = usuarioRepository.findById(id)
                 .orElseThrow(() -> new UsuarioNaoEncontradoException(id));
 
-        // Se está tentando atualizar a senha, verifica a senha atual primeiro
         if (usuarioAtualizado.getSenha() != null && !usuarioAtualizado.getSenha().isEmpty()) {
             if (senhaAtual == null || !passwordEncoder.matches(senhaAtual, usuarioExistente.getSenha())) {
                 throw new RuntimeException("Senha atual incorreta");
@@ -76,7 +70,6 @@ public class UsuarioService {
             usuarioExistente.setSenha(passwordEncoder.encode(usuarioAtualizado.getSenha()));
         }
 
-        // Atualiza outros campos se necessário
         if (usuarioAtualizado.getNome() != null) {
             usuarioExistente.setNome(usuarioAtualizado.getNome());
         }

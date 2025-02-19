@@ -1,6 +1,6 @@
 package com.timetracker.sistema_gerenciamento.controller;
 
-import com.timetracker.sistema_gerenciamento.model.ResourceNotFoundException;
+import com.timetracker.sistema_gerenciamento.exception.ResourceNotFoundException;
 import com.timetracker.sistema_gerenciamento.model.Tarefa;
 import com.timetracker.sistema_gerenciamento.model.Projeto;
 import com.timetracker.sistema_gerenciamento.service.TarefaService;

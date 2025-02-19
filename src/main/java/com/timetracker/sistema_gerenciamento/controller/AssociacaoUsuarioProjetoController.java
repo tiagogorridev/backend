@@ -11,7 +11,6 @@ public class AssociacaoUsuarioProjetoController {
     @Autowired
     private AssociacaoUsuarioProjetoService associacaoUsuarioProjetoService;
 
-    // Endpoint para associar usuário ao projeto
     @PostMapping("/usuario-projeto")
     public String associarUsuarioAoProjeto(@RequestParam Long idUsuario, @RequestParam Long idProjeto) {
         try {

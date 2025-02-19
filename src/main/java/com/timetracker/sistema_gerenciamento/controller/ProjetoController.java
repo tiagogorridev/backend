@@ -7,7 +7,6 @@ import com.timetracker.sistema_gerenciamento.repository.ClienteRepository;
 import com.timetracker.sistema_gerenciamento.repository.UsuarioRepository;
 import com.timetracker.sistema_gerenciamento.service.ProjetoService;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.timetracker.sistema_gerenciamento.model.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,10 +37,7 @@ public class ProjetoController {
             existingProjeto.setNome(projeto.getNome());
         }
 
-        // Ignorar a atualização do cliente
-        if (projeto.getCliente() != null && projeto.getCliente().getId() != null) {
-            // Não fazemos nada aqui, para garantir que o cliente não seja alterado
-        }
+        if (projeto.getCliente() != null && projeto.getCliente().getId() != null) {}
 
         if (projeto.getHorasEstimadas() != null) {
             existingProjeto.setHorasEstimadas(projeto.getHorasEstimadas());
@@ -51,7 +47,6 @@ public class ProjetoController {
             existingProjeto.setCustoEstimado(projeto.getCustoEstimado());
         }
 
-        // Adicionar esses blocos para lidar com status e prioridade
         if (projeto.getStatus() != null) {
             existingProjeto.setStatus(projeto.getStatus());
         }
@@ -63,6 +58,7 @@ public class ProjetoController {
         projetoService.save(existingProjeto);
         return ResponseEntity.ok(existingProjeto);
     }
+
     @PostMapping
     public Projeto createProjeto(@RequestBody Projeto projeto) {
         Long usuarioId = projeto.getUsuarioResponsavel().getId();
@@ -92,10 +88,7 @@ public class ProjetoController {
         if (projeto != null) {
             return ResponseEntity.ok(projeto);
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(null);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
-
-
 }

@@ -1,6 +1,6 @@
 package com.timetracker.sistema_gerenciamento.controller;
-import com.timetracker.sistema_gerenciamento.model.Usuario;
 
+import com.timetracker.sistema_gerenciamento.model.Usuario;
 import com.timetracker.sistema_gerenciamento.security.JwtUtil;
 import com.timetracker.sistema_gerenciamento.service.UsuarioService;
 import com.timetracker.sistema_gerenciamento.security.TokenBlacklistService;
@@ -61,9 +61,11 @@ public class AuthController {
             response.put("id", usuario.getId());  // Adiciona o ID
             response.put("token", token);
             response.put("perfil", usuario.getPerfil());
+
             System.out.println("email logado: " + request.getEmail());
             System.out.println("token logado: " + token);
             System.out.println("id logado: " + usuario.getId());
+
             return ResponseEntity.ok(response);
 
         } catch (BadCredentialsException e) {
@@ -73,16 +75,6 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Erro ao realizar login: " + e.getMessage()));
         }
-    }
-
-    public static class LoginRequest {
-        private String email;
-        private String senha;
-
-        public String getEmail() { return email; }
-        public void setEmail(String email) { this.email = email; }
-        public String getSenha() { return senha; }
-        public void setSenha(String senha) { this.senha = senha; }
     }
 
     @PostMapping("/logout")
@@ -98,5 +90,26 @@ public class AuthController {
         tokenBlacklistService.invalidateToken(token);
 
         return ResponseEntity.ok("Logout realizado com sucesso. Token invalidado.");
+    }
+
+    public static class LoginRequest {
+        private String email;
+        private String senha;
+
+        public String getEmail() {
+            return email;
+        }
+
+        public void setEmail(String email) {
+            this.email = email;
+        }
+
+        public String getSenha() {
+            return senha;
+        }
+
+        public void setSenha(String senha) {
+            this.senha = senha;
+        }
     }
 }

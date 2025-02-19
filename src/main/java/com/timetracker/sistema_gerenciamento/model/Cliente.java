@@ -39,7 +39,6 @@ public class Cliente {
         this.id = id;
     }
 
-    // Getters e setters
     public Long getId() {
         return id;
     }

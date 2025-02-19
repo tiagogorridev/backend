@@ -6,6 +6,7 @@ import java.util.Set;
 
 @Service
 public class TokenBlacklistService {
+
     private final Set<String> invalidatedTokens = new HashSet<>();
 
     public void invalidateToken(String token) {

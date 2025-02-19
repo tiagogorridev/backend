@@ -31,25 +31,18 @@ public class UsuarioController {
     @PostMapping("/cadastro")
     public ResponseEntity<?> cadastrarUsuario(@RequestBody Usuario usuario) {
         try {
-            // Verifica se o e-mail já está cadastrado
             if (usuarioService.buscarPorEmail(usuario.getEmail()) != null) {
                 return ResponseEntity.badRequest()
                         .body(Map.of("message", "Email já cadastrado"));
             }
-
-            // Salva o novo usuário
             Usuario novoUsuario = usuarioService.salvarUsuario(usuario);
-
-            // Cria um Map com os dados necessários do novo usuário
             Map<String, Object> response = new HashMap<>();
             response.put("id", novoUsuario.getId());
             response.put("nome", novoUsuario.getNome());
             response.put("email", novoUsuario.getEmail());
             response.put("perfil", novoUsuario.getPerfil());
             response.put("message", "Usuário cadastrado com sucesso");
-
-            return ResponseEntity.status(HttpStatus.CREATED).body(response); // Retorna o status 201
-
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -60,7 +53,6 @@ public class UsuarioController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/emails")
     public ResponseEntity<List<String>> getEmails() {
-        // Busca todos os e-mails dos usuários
         List<String> emails = usuarioService.getEmails();
         return ResponseEntity.ok(emails);
     }
@@ -72,8 +64,6 @@ public class UsuarioController {
     ) {
         try {
             Usuario usuarioAtualizado = new Usuario();
-
-            // Extrair dados do requestBody
             if (requestBody.get("nome") != null) {
                 usuarioAtualizado.setNome((String) requestBody.get("nome"));
             }

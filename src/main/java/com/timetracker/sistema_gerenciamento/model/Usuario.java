@@ -44,7 +44,6 @@ public class Usuario implements UserDetails {
 
     private String perfil;
 
-    // Construtores
     public Usuario() {
     }
 
@@ -55,7 +54,6 @@ public class Usuario implements UserDetails {
         this.perfil = perfil;
     }
 
-    // Getters e Setters
     public Long getId() {
         return id;
     }
@@ -112,7 +110,6 @@ public class Usuario implements UserDetails {
         this.perfil = perfil;
     }
 
-    // Método para atribuir a data de criação antes de persistir no banco
     @PrePersist
     public void prePersist() {
         if (dataCriacao == null) {
@@ -120,12 +117,9 @@ public class Usuario implements UserDetails {
         }
     }
 
-    // Método para atualizar o último login
     public void atualizarUltimoLogin() {
         this.ultimoLogin = LocalDateTime.now();
     }
-
-    // Métodos da interface UserDetails
 
     @JsonIgnore
     @Override

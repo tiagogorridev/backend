@@ -32,7 +32,6 @@ public class Tarefa {
     private LocalDateTime dataCriacao = LocalDateTime.now();
 
     // Getters e Setters
-
     public Long getId() {
         return id;
     }
