@@ -2,6 +2,7 @@ package com.timetracker.sistema_gerenciamento.controller;
 
 import com.timetracker.sistema_gerenciamento.exception.UsuarioNaoEncontradoException;
 import com.timetracker.sistema_gerenciamento.model.Usuario;
+import com.timetracker.sistema_gerenciamento.service.AssociacaoUsuarioProjetoService;
 import com.timetracker.sistema_gerenciamento.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -119,6 +120,24 @@ public class UsuarioController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Erro ao verificar senha: " + e.getMessage()));
+        }
+    }
+
+    @RestController
+    @RequestMapping("/api/projetos")
+    public class ProjetoController {
+
+        @Autowired
+        private AssociacaoUsuarioProjetoService associacaoService;
+
+        @PostMapping("/{idProjeto}/adicionar-usuario/{idUsuario}")
+        public ResponseEntity<String> associarUsuarioAoProjeto(@PathVariable Long idProjeto, @PathVariable Long idUsuario) {
+            try {
+                associacaoService.associarUsuarioAoProjeto(idUsuario, idProjeto);
+                return ResponseEntity.ok("Usuário adicionado ao projeto com sucesso!");
+            } catch (RuntimeException e) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            }
         }
     }
 }
