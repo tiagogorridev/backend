@@ -86,6 +86,7 @@ public class ProjetoController {
     public ResponseEntity<Projeto> getProjeto(@PathVariable Long id) {
         Projeto projeto = projetoService.getProjetoById(id);
         if (projeto != null) {
+                projeto.getCliente().getId();
             return ResponseEntity.ok(projeto);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
