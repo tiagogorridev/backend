@@ -54,4 +54,17 @@ public class AssociacaoUsuarioProjetoService {
                         .orElseThrow(() -> new RuntimeException("Usuário não encontrado")))
                 .collect(Collectors.toList());
     }
+
+    public List<Projeto> getProjetosAssociados(Long usuarioId) {
+        List<UsuariosProjetos> associacoes = usuariosProjetosRepository.findByIdUsuario(usuarioId);
+
+        if (associacoes.isEmpty()) {
+            throw new RuntimeException("Este usuário não está associado a nenhum projeto.");
+        }
+
+        return associacoes.stream()
+                .map(associacao -> projetoRepository.findById(associacao.getIdProjeto())
+                        .orElseThrow(() -> new RuntimeException("Projeto não encontrado com ID " + associacao.getIdProjeto())))
+                .collect(Collectors.toList());
+    }
 }
