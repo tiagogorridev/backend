@@ -5,6 +5,7 @@ import com.timetracker.sistema_gerenciamento.model.Cliente;
 import com.timetracker.sistema_gerenciamento.model.Usuario;
 import com.timetracker.sistema_gerenciamento.repository.ClienteRepository;
 import com.timetracker.sistema_gerenciamento.repository.UsuarioRepository;
+import com.timetracker.sistema_gerenciamento.service.AssociacaoUsuarioProjetoService;
 import com.timetracker.sistema_gerenciamento.service.ProjetoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,9 @@ public class ProjetoController {
 
     @Autowired
     private ClienteRepository clienteRepository;
+
+    @Autowired
+    private AssociacaoUsuarioProjetoService associacaoUsuarioProjetoService;
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateProjeto(@PathVariable Long id, @RequestBody Projeto projeto) {
@@ -78,7 +82,7 @@ public class ProjetoController {
 
     @GetMapping("/usuario/{usuarioId}")
     public ResponseEntity<List<Projeto>> getProjetosDoUsuario(@PathVariable Long usuarioId) {
-        List<Projeto> projetos = projetoService.getProjetosPorUsuario(usuarioId);
+        List<Projeto> projetos = associacaoUsuarioProjetoService.getProjetosAssociados(usuarioId);
         return ResponseEntity.ok(projetos);
     }
 
@@ -92,4 +96,5 @@ public class ProjetoController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
+
 }
