@@ -1,5 +1,6 @@
 package com.timetracker.sistema_gerenciamento.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
@@ -29,7 +30,7 @@ public class Cliente {
     private String status = "ATIVO";
 
     @OneToMany(mappedBy = "cliente")
-    @JsonManagedReference
+    @JsonIgnore
     private Set<Projeto> projetos;
 
     public Cliente() {
