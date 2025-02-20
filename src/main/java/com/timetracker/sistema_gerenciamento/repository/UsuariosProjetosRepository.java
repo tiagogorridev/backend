@@ -9,5 +9,8 @@ import java.util.List;
 @Repository
 public interface UsuariosProjetosRepository extends JpaRepository<UsuariosProjetos, Long> {
     boolean existsByIdUsuarioAndIdProjeto(Long idUsuario, Long idProjeto);
+
     List<UsuariosProjetos> findByIdProjeto(Long idProjeto);
+
+    List<UsuariosProjetos> findByIdUsuario(Long idUsuario);
 }
