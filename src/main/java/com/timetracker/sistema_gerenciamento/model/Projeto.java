@@ -3,6 +3,7 @@ package com.timetracker.sistema_gerenciamento.model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -47,6 +48,9 @@ public class Projeto {
     @ManyToOne
     @JoinColumn(name = "id_cliente", referencedColumnName = "id", nullable = false)
     private Cliente cliente;
+
+    @Column(name = "data_criacao", updatable = false)
+    private LocalDateTime dataCriacao;
 
     // Getters e Setters
     public Long getId() {
