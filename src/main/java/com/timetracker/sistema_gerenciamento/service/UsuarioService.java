@@ -2,9 +2,11 @@ package com.timetracker.sistema_gerenciamento.service;
 
 import com.timetracker.sistema_gerenciamento.exception.UsuarioNaoEncontradoException;
 import com.timetracker.sistema_gerenciamento.model.Usuario;
+import com.timetracker.sistema_gerenciamento.model.UsuariosProjetos;
 import com.timetracker.sistema_gerenciamento.repository.UsuarioRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.timetracker.sistema_gerenciamento.repository.UsuariosProjetosRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,10 +16,14 @@ import java.util.stream.Collectors;
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
+    private final UsuariosProjetosRepository usuariosProjetosRepository;  // Adicionando a referência ao repositório
     private final PasswordEncoder passwordEncoder;
 
-    public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
+    public UsuarioService(UsuarioRepository usuarioRepository,
+                          UsuariosProjetosRepository usuariosProjetosRepository,
+                          PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
+        this.usuariosProjetosRepository = usuariosProjetosRepository;  // Inicializando o repositório
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -89,4 +95,5 @@ public class UsuarioService {
 
         return passwordEncoder.matches(senhaAtual, usuario.getSenha());
     }
+
 }

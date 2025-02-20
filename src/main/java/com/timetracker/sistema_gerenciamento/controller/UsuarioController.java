@@ -130,4 +130,17 @@ public class UsuarioController {
             }
         }
     }
+
+    @GetMapping("/by-email")
+    public ResponseEntity<Long> getUserIdByEmail(@RequestParam String email) {
+        try {
+            Usuario usuario = usuarioService.buscarPorEmail(email);
+            if (usuario != null) {
+                return ResponseEntity.ok(usuario.getId());
+            }
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }

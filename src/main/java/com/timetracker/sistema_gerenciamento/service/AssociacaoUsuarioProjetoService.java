@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AssociacaoUsuarioProjetoService {
@@ -40,5 +42,16 @@ public class AssociacaoUsuarioProjetoService {
         associacao.setDataAssociacao(LocalDateTime.now());
 
         usuariosProjetosRepository.save(associacao);
+    }
+
+
+    public List<Usuario> getMembrosProjetoPorId(Long projetoId) {
+        List<UsuariosProjetos> associacoes = usuariosProjetosRepository
+                .findByIdProjeto(projetoId);
+
+        return associacoes.stream()
+                .map(associacao -> usuarioRepository.findById(associacao.getIdUsuario())
+                        .orElseThrow(() -> new RuntimeException("Usuário não encontrado")))
+                .collect(Collectors.toList());
     }
 }
