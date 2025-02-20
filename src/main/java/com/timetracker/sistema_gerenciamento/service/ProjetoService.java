@@ -17,10 +17,14 @@ public class ProjetoService {
     @Autowired
     private ProjetoRepository projetoRepository;
 
-    @Transactional(readOnly = true)
+    @Transactional
     public Projeto getProjetoById(Long id) {
-        return projetoRepository.findProjetoWithClienteById(id)
+        return projetoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Projeto não encontrado"));
+    }
+
+    public List<Projeto> getProjetosPorUsuario(Long usuarioId) {
+        return projetoRepository.findByUsuarioResponsavelId(usuarioId);
     }
 
     @Transactional
@@ -66,4 +70,5 @@ public class ProjetoService {
     public List<Projeto> findByUsuarioId(Long usuarioId) {
         return projetoRepository.findByUsuarioResponsavelId(usuarioId);  // Correção
     }
+
 }

@@ -80,8 +80,14 @@ public class ProjetoController {
         return projetoService.save(projeto);
     }
 
-    @GetMapping("/usuario/{usuarioId}")
+    @GetMapping("/usuario/{usuarioId}/projetos")
     public ResponseEntity<List<Projeto>> getProjetosDoUsuario(@PathVariable Long usuarioId) {
+        List<Projeto> projetos = projetoService.getProjetosPorUsuario(usuarioId);
+        return ResponseEntity.ok(projetos);
+    }
+
+    @GetMapping("/usuario/{usuarioId}/associacoes")
+    public ResponseEntity<List<Projeto>> getProjetosAssociadosDoUsuario(@PathVariable Long usuarioId) {
         List<Projeto> projetos = associacaoUsuarioProjetoService.getProjetosAssociados(usuarioId);
         return ResponseEntity.ok(projetos);
     }
