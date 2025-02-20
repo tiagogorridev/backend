@@ -24,4 +24,8 @@ public class TarefaService {
     public Tarefa salvarTarefa(Tarefa tarefa) {
         return tarefaRepository.save(tarefa);
     }
+
+    public List<Tarefa> getTarefasByProjectId(Long projectId) {
+        return tarefaRepository.findByProjetoId(projectId);
+    }
 }

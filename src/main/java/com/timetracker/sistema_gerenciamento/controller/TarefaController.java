@@ -52,4 +52,10 @@ public class TarefaController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(novaTarefa);
     }
+
+    @GetMapping("/projetos/{projectId}/tarefas")
+    public ResponseEntity<List<Tarefa>> getProjectTasks(@PathVariable Long projectId) {
+        List<Tarefa> tarefas = tarefaService.getTarefasByProjectId(projectId);
+        return ResponseEntity.ok(tarefas);
+    }
 }
