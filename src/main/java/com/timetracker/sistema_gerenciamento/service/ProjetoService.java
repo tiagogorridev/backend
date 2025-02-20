@@ -17,6 +17,12 @@ public class ProjetoService {
     @Autowired
     private ProjetoRepository projetoRepository;
 
+    @Transactional(readOnly = true)
+    public Projeto getProjetoById(Long id) {
+        return projetoRepository.findProjetoWithClienteById(id)
+                .orElseThrow(() -> new RuntimeException("Projeto não encontrado"));
+    }
+
     @Transactional
     public Projeto save(Projeto projeto) {
         return projetoRepository.save(projeto);
@@ -55,12 +61,6 @@ public class ProjetoService {
         projetoRepository.flush();
 
         return projetoAtualizado;
-    }
-
-    @Transactional
-    public Projeto getProjetoById(Long id) {
-        return projetoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Projeto não encontrado"));
     }
 
     public List<Projeto> getProjetosPorUsuario(Long usuarioId) {
