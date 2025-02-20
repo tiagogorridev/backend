@@ -46,7 +46,6 @@ public class Projeto {
 
     @ManyToOne
     @JoinColumn(name = "id_cliente", referencedColumnName = "id", nullable = false)
-    @JsonBackReference
     private Cliente cliente;
 
     // Getters e Setters
