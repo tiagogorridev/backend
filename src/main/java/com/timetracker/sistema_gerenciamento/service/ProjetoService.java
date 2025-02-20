@@ -63,7 +63,7 @@ public class ProjetoService {
         return projetoAtualizado;
     }
 
-    public List<Projeto> getProjetosPorUsuario(Long usuarioId) {
-        return projetoRepository.findByUsuarioResponsavelId(usuarioId);
+    public List<Projeto> findByUsuarioId(Long usuarioId) {
+        return projetoRepository.findByUsuarioResponsavelId(usuarioId);  // Correção
     }
 }
