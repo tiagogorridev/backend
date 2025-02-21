@@ -47,6 +47,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/usuarios/cadastro").permitAll()
                         .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                         .requestMatchers("/api/user/**").hasAuthority("USUARIO")
+                        .requestMatchers("/email/send").authenticated() // Permite acesso para qualquer usuário autenticado
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
