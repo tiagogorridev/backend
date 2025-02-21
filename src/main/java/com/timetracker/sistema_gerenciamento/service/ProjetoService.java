@@ -71,4 +71,5 @@ public class ProjetoService {
         return projetoRepository.findByUsuarioResponsavelId(usuarioId);  // Correção
     }
 
+
 }

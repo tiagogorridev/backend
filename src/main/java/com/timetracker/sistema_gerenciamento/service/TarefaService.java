@@ -28,4 +28,8 @@ public class TarefaService {
     public List<Tarefa> getTarefasByProjectId(Long projectId) {
         return tarefaRepository.findByProjetoId(projectId);
     }
+
+    public void deleteTarefa(Long id) {
+        tarefaRepository.deleteById(id);
+    }
 }
