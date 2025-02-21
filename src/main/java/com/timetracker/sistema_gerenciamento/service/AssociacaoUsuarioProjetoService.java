@@ -67,4 +67,12 @@ public class AssociacaoUsuarioProjetoService {
                         .orElseThrow(() -> new RuntimeException("Projeto não encontrado com ID " + associacao.getIdProjeto())))
                 .collect(Collectors.toList());
     }
+
+    public void removerUsuarioDoProjeto(Long idUsuario, Long idProjeto) {
+        UsuariosProjetos associacao = usuariosProjetosRepository
+                .findByIdUsuarioAndIdProjeto(idUsuario, idProjeto)
+                .orElseThrow(() -> new RuntimeException("Associação não encontrada"));
+
+        usuariosProjetosRepository.delete(associacao);
+    }
 }

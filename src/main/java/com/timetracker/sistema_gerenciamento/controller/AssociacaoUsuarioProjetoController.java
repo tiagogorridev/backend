@@ -40,4 +40,16 @@ public class AssociacaoUsuarioProjetoController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @DeleteMapping("/{projetoId}/remover-usuario/{usuarioId}")
+    public ResponseEntity<String> removerUsuarioDoProjeto(
+            @PathVariable Long projetoId,
+            @PathVariable Long usuarioId) {
+        try {
+            associacaoService.removerUsuarioDoProjeto(usuarioId, projetoId);
+            return ResponseEntity.ok("Usuário removido com sucesso do projeto!");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }
