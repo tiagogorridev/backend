@@ -3,6 +3,7 @@ package com.timetracker.sistema_gerenciamento.controller;
 import com.timetracker.sistema_gerenciamento.exception.ResourceNotFoundException;
 import com.timetracker.sistema_gerenciamento.model.Tarefa;
 import com.timetracker.sistema_gerenciamento.model.Projeto;
+import com.timetracker.sistema_gerenciamento.repository.TarefaRepository;
 import com.timetracker.sistema_gerenciamento.service.TarefaService;
 import com.timetracker.sistema_gerenciamento.repository.ProjetoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,9 @@ public class TarefaController {
 
     @Autowired
     private ProjetoRepository projetoRepository;
+
+    @Autowired
+    private TarefaRepository tarefaRepository;
 
     @GetMapping
     public ResponseEntity<List<Tarefa>> listarTodasTarefas() {
@@ -57,5 +61,14 @@ public class TarefaController {
     public ResponseEntity<List<Tarefa>> getProjectTasks(@PathVariable Long projectId) {
         List<Tarefa> tarefas = tarefaService.getTarefasByProjectId(projectId);
         return ResponseEntity.ok(tarefas);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteTarefa(@PathVariable Long id) {
+        if (!tarefaRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Tarefa não encontrada");
+        }
+        tarefaService.deleteTarefa(id);
+        return ResponseEntity.noContent().build();
     }
 }
