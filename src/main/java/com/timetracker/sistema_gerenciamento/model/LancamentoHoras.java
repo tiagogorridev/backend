@@ -41,15 +41,6 @@ public class LancamentoHoras {
     @Column(columnDefinition = "TEXT")
     private String descricao;
 
-    @Column(columnDefinition = "TIME DEFAULT '00:00:00'")
-    private LocalTime totalDia;
-
-    @Column(columnDefinition = "TIME DEFAULT '00:00:00'")
-    private LocalTime totalSemana;
-
-    @Column(columnDefinition = "TIME DEFAULT '00:00:00'")
-    private LocalTime totalMes;
-
     // Getters e Setters
     public Long getId() {
         return id;
@@ -121,29 +112,5 @@ public class LancamentoHoras {
 
     public void setDescricao(String descricao) {
         this.descricao = descricao;
-    }
-
-    public LocalTime getTotalDia() {
-        return totalDia;
-    }
-
-    public void setTotalDia(LocalTime totalDia) {
-        this.totalDia = totalDia;
-    }
-
-    public LocalTime getTotalSemana() {
-        return totalSemana;
-    }
-
-    public void setTotalSemana(LocalTime totalSemana) {
-        this.totalSemana = totalSemana;
-    }
-
-    public LocalTime getTotalMes() {
-        return totalMes;
-    }
-
-    public void setTotalMes(LocalTime totalMes) {
-        this.totalMes = totalMes;
     }
 }
