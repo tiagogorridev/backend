@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -103,4 +104,14 @@ public class ProjetoController {
         }
     }
 
+    @GetMapping("/{id}/horas-disponiveis")
+    public ResponseEntity<BigDecimal> getHorasDisponiveis(@PathVariable Long id) {
+        Projeto projeto = projetoService.getProjetoById(id);
+        if (projeto == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        BigDecimal horasDisponiveis = projetoService.calcularHorasDisponiveis(id);
+        return ResponseEntity.ok(horasDisponiveis);
+    }
 }
