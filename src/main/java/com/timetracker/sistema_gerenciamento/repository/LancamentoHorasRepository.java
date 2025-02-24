@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface LancamentoHorasRepository extends JpaRepository<LancamentoHoras, Long> {
     List<LancamentoHoras> findByUsuarioIdOrderByDataDescHoraInicioDesc(Long usuarioId);
+    List<LancamentoHoras> findByStatusOrderByDataDesc(String status);
 }
