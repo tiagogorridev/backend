@@ -1,5 +1,6 @@
 package com.timetracker.sistema_gerenciamento.service;
 
+import com.timetracker.sistema_gerenciamento.exception.ResourceNotFoundException;
 import com.timetracker.sistema_gerenciamento.model.Projeto;
 import com.timetracker.sistema_gerenciamento.model.Tarefa;
 import com.timetracker.sistema_gerenciamento.repository.TarefaRepository;
@@ -58,5 +59,11 @@ public class TarefaService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         return projeto.getHorasEstimadas().subtract(horasUtilizadas);
+    }
+
+    public Tarefa findTarefaById(Long idprojeto, Long idtarefa) {
+        // Implemente a lógica de busca pela tarefa usando os IDs
+        return tarefaRepository.findByIdAndProjetoId(idtarefa, idprojeto)
+                .orElseThrow(() -> new ResourceNotFoundException("Tarefa não encontrada"));
     }
 }
