@@ -1,5 +1,7 @@
 package com.timetracker.sistema_gerenciamento.service;
 
+import com.timetracker.sistema_gerenciamento.model.Tarefa;
+import com.timetracker.sistema_gerenciamento.repository.TarefaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,6 +11,7 @@ import com.timetracker.sistema_gerenciamento.model.Prioridade;
 import com.timetracker.sistema_gerenciamento.model.Status;
 import com.timetracker.sistema_gerenciamento.repository.ProjetoRepository;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -16,6 +19,9 @@ public class ProjetoService {
 
     @Autowired
     private ProjetoRepository projetoRepository;
+
+    @Autowired
+    private TarefaRepository tarefaRepository;
 
     @Transactional
     public Projeto getProjetoById(Long id) {
@@ -72,4 +78,20 @@ public class ProjetoService {
     }
 
 
+    @Transactional(readOnly = true)
+    public BigDecimal calcularHorasDisponiveis(Long projetoId) {
+        Projeto projeto = getProjetoById(projetoId);
+        if (projeto == null || projeto.getHorasEstimadas() == null) {
+            return BigDecimal.ZERO;
+        }
+
+        List<Tarefa> tarefas = tarefaRepository.findByProjetoId(projetoId);
+
+        BigDecimal horasUtilizadas = tarefas.stream()
+                .map(Tarefa::getHorasEstimadas)
+                .filter(horas -> horas != null)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        return projeto.getHorasEstimadas().subtract(horasUtilizadas);
+    }
 }
