@@ -71,4 +71,36 @@ public class TarefaController {
         tarefaService.deleteTarefa(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/detalhes/{idprojeto}/{idtarefa}")
+    public ResponseEntity<Tarefa> getTarefaDetails(@PathVariable Long idprojeto, @PathVariable Long idtarefa) {
+        Tarefa tarefa = tarefaService.findTarefaById(idprojeto, idtarefa);
+        return ResponseEntity.ok(tarefa);
+    }
+
+    @PutMapping("/detalhes/{idprojeto}/{idtarefa}")
+    public ResponseEntity<Tarefa> updateTarefa(@PathVariable Long idprojeto,
+                                               @PathVariable Long idtarefa,
+                                               @RequestBody Tarefa tarefaAtualizada) {
+        // Verifica se o projeto existe
+        Projeto projeto = projetoRepository.findById(idprojeto)
+                .orElseThrow(() -> new ResourceNotFoundException("Projeto não encontrado"));
+
+        // Verifica se a tarefa existe
+        Tarefa tarefa = tarefaRepository.findByIdAndProjetoId(idtarefa, idprojeto)
+                .orElseThrow(() -> new ResourceNotFoundException("Tarefa não encontrada"));
+
+        // Atualiza os dados da tarefa
+        tarefa.setNome(tarefaAtualizada.getNome());
+        tarefa.setDescricao(tarefaAtualizada.getDescricao());
+        tarefa.setDataInicio(tarefaAtualizada.getDataInicio());
+        tarefa.setDataFim(tarefaAtualizada.getDataFim());
+        tarefa.setStatus(tarefaAtualizada.getStatus());
+        tarefa.setHorasEstimadas(tarefaAtualizada.getHorasEstimadas());
+
+        // Salva a tarefa atualizada
+        Tarefa tarefaSalva = tarefaRepository.save(tarefa);
+
+        return ResponseEntity.ok(tarefaSalva);
+    }
 }
