@@ -3,6 +3,7 @@ package com.timetracker.sistema_gerenciamento.controller;
 import com.timetracker.sistema_gerenciamento.DTO.LancamentoHorasDTO;
 import com.timetracker.sistema_gerenciamento.model.LancamentoHoras;
 import com.timetracker.sistema_gerenciamento.service.LancamentoHorasService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,26 +14,16 @@ import java.util.List;
 @RequestMapping("/api/lancamento")
 public class LancamentoHorasController {
 
-    private final LancamentoHorasService lancamentoHorasService;
-
-    public LancamentoHorasController(LancamentoHorasService lancamentoHorasService) {
-        this.lancamentoHorasService = lancamentoHorasService;
-    }
+    @Autowired
+    private LancamentoHorasService lancamentoHorasService;
 
     @PostMapping
-    public ResponseEntity<?> createLaunch(@RequestBody LancamentoHorasDTO lancamentoHorasDTO) {
-        System.out.println("Recebido DTO: " + lancamentoHorasDTO);
-
-        if (lancamentoHorasDTO.getIdUsuario() == null || lancamentoHorasDTO.getIdProjeto() == null || lancamentoHorasDTO.getIdTarefa() == null) {
-            return new ResponseEntity<>("Usuário, Projeto ou Atividade não informados!", HttpStatus.BAD_REQUEST);
-        }
-
+    public ResponseEntity<LancamentoHoras> salvarLancamento(@RequestBody LancamentoHorasDTO lancamentoHorasDTO) {
         try {
-            LancamentoHoras lancamentoHoras = lancamentoHorasService.salvarLancamento(lancamentoHorasDTO);
-            return new ResponseEntity<>(lancamentoHoras, HttpStatus.CREATED);
+            LancamentoHoras lancamentoSalvo = lancamentoHorasService.salvarLancamento(lancamentoHorasDTO);
+            return ResponseEntity.ok(lancamentoSalvo);
         } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>("Erro ao salvar o lançamento de horas", HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
 
@@ -40,9 +31,64 @@ public class LancamentoHorasController {
     public ResponseEntity<List<LancamentoHoras>> getLancamentosByUsuario(@PathVariable Long usuarioId) {
         try {
             List<LancamentoHoras> lancamentos = lancamentoHorasService.findByUsuarioId(usuarioId);
-            return new ResponseEntity<>(lancamentos, HttpStatus.OK);
+            return ResponseEntity.ok(lancamentos);
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @GetMapping("/em-analise")
+    public ResponseEntity<List<LancamentoHoras>> getLancamentosEmAnalise() {
+        try {
+            List<LancamentoHoras> lancamentos = lancamentoHorasService.findByStatus("EM_ANALISE");
+            return ResponseEntity.ok(lancamentos);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @PutMapping("/aprovar/{lancamentoId}")
+    public ResponseEntity<LancamentoHoras> aprovarLancamento(@PathVariable Long lancamentoId) {
+        try {
+            LancamentoHoras lancamento = lancamentoHorasService.atualizarStatus(lancamentoId, "APROVADO");
+            return ResponseEntity.ok(lancamento);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @PutMapping("/rejeitar/{lancamentoId}")
+    public ResponseEntity<LancamentoHoras> rejeitarLancamento(@PathVariable Long lancamentoId) {
+        try {
+            LancamentoHoras lancamento = lancamentoHorasService.atualizarStatus(lancamentoId, "REJEITADO");
+            return ResponseEntity.ok(lancamento);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @PutMapping("/{lancamentoId}/status")
+    public ResponseEntity<LancamentoHoras> atualizarStatus(
+            @PathVariable Long lancamentoId,
+            @RequestBody StatusRequest statusRequest) {
+        try {
+            LancamentoHoras lancamento = lancamentoHorasService.atualizarStatus(lancamentoId, statusRequest.getStatus());
+            return ResponseEntity.ok(lancamento);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    // Classe interna para receber a requisição de atualização de status
+    private static class StatusRequest {
+        private String status;
+
+        public String getStatus() {
+            return status;
+        }
+
+        public void setStatus(String status) {
+            this.status = status;
         }
     }
 }
