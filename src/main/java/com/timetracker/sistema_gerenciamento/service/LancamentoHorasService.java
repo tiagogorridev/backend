@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -53,5 +54,9 @@ public class LancamentoHorasService {
         lancamentoHoras.setDescricao(lancamentoHorasDTO.getDescricao());
 
         return lancamentoHorasRepository.save(lancamentoHoras);
+    }
+
+    public List<LancamentoHoras> findByUsuarioId(Long usuarioId) {
+        return lancamentoHorasRepository.findByUsuarioIdOrderByDataDescHoraInicioDesc(usuarioId);
     }
 }
