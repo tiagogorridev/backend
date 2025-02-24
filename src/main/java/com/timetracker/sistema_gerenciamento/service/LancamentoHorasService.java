@@ -9,15 +9,13 @@ import com.timetracker.sistema_gerenciamento.repository.LancamentoHorasRepositor
 import com.timetracker.sistema_gerenciamento.repository.ProjetoRepository;
 import com.timetracker.sistema_gerenciamento.repository.TarefaRepository;
 import com.timetracker.sistema_gerenciamento.repository.UsuarioRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class LancamentoHorasService {
@@ -53,10 +51,31 @@ public class LancamentoHorasService {
         lancamentoHoras.setHoraFim(LocalTime.parse(lancamentoHorasDTO.getHoraFim()));
         lancamentoHoras.setDescricao(lancamentoHorasDTO.getDescricao());
 
+        // Definir o status padrão como "EM_ANALISE"
+        lancamentoHoras.setStatus("EM_ANALISE");
+
         return lancamentoHorasRepository.save(lancamentoHoras);
     }
 
     public List<LancamentoHoras> findByUsuarioId(Long usuarioId) {
         return lancamentoHorasRepository.findByUsuarioIdOrderByDataDescHoraInicioDesc(usuarioId);
+    }
+
+    public List<LancamentoHoras> findByStatus(String status) {
+        return lancamentoHorasRepository.findByStatusOrderByDataDesc(status);
+    }
+
+    @Transactional
+    public LancamentoHoras atualizarStatus(Long lancamentoId, String novoStatus) {
+        LancamentoHoras lancamento = lancamentoHorasRepository.findById(lancamentoId)
+                .orElseThrow(() -> new RuntimeException("Lançamento não encontrado"));
+
+        // Verificar se o status é válido
+        if (!novoStatus.equals("APROVADO") && !novoStatus.equals("REJEITADO") && !novoStatus.equals("EM_ANALISE")) {
+            throw new RuntimeException("Status inválido");
+        }
+
+        lancamento.setStatus(novoStatus);
+        return lancamentoHorasRepository.save(lancamento);
     }
 }
