@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/lancamento")
 public class LancamentoHorasController {
@@ -31,6 +33,16 @@ public class LancamentoHorasController {
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>("Erro ao salvar o lançamento de horas", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/usuario/{usuarioId}")
+    public ResponseEntity<List<LancamentoHoras>> getLancamentosByUsuario(@PathVariable Long usuarioId) {
+        try {
+            List<LancamentoHoras> lancamentos = lancamentoHorasService.findByUsuarioId(usuarioId);
+            return new ResponseEntity<>(lancamentos, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
