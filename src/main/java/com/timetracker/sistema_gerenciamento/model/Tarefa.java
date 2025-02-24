@@ -1,6 +1,8 @@
 package com.timetracker.sistema_gerenciamento.model;
 
 import jakarta.persistence.*;
+
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -30,6 +32,9 @@ public class Tarefa {
     private Usuario usuarioResponsavel;
 
     private LocalDateTime dataCriacao = LocalDateTime.now();
+
+    @Column(name = "horas_estimadas", precision = 10, scale = 2)
+    private BigDecimal horasEstimadas;
 
     // Getters e Setters
     public Long getId() {
@@ -102,5 +107,13 @@ public class Tarefa {
 
     public void setDataCriacao(LocalDateTime dataCriacao) {
         this.dataCriacao = dataCriacao;
+    }
+
+    public BigDecimal getHorasEstimadas() {
+        return horasEstimadas;
+    }
+
+    public void setHorasEstimadas(BigDecimal horasEstimadas) {
+        this.horasEstimadas = horasEstimadas;
     }
 }
