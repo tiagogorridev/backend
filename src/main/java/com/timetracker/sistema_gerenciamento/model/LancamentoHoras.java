@@ -3,7 +3,6 @@ package com.timetracker.sistema_gerenciamento.model;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
-
 import java.time.LocalTime;
 
 @Entity
@@ -40,6 +39,9 @@ public class LancamentoHoras {
 
     @Column(columnDefinition = "TEXT")
     private String descricao;
+
+    @Column(nullable = false)
+    private String status;
 
     // Getters e Setters
     public Long getId() {
@@ -112,5 +114,13 @@ public class LancamentoHoras {
 
     public void setDescricao(String descricao) {
         this.descricao = descricao;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }
