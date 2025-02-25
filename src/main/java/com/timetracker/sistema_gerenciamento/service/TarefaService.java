@@ -29,11 +29,15 @@ public class TarefaService {
     }
 
     public Tarefa salvarTarefa(Tarefa tarefa) {
-        // Primeiro verifica se as horas são válidas
         BigDecimal horasDisponiveis = calcularHorasDisponiveisProjeto(tarefa.getProjeto().getId());
 
         if (tarefa.getHorasEstimadas().compareTo(horasDisponiveis) > 0) {
             throw new IllegalArgumentException("Horas estimadas excedem o limite disponível do projeto");
+        }
+
+        Projeto projeto = tarefa.getProjeto();
+        if (tarefa.getDataInicio().isBefore(projeto.getDataInicio()) || tarefa.getDataFim().isAfter(projeto.getDataFim())) {
+            throw new IllegalArgumentException("As datas da tarefa devem estar dentro do intervalo do projeto.");
         }
 
         return tarefaRepository.save(tarefa);

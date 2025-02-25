@@ -1,7 +1,6 @@
 package com.timetracker.sistema_gerenciamento.model;
 
 import jakarta.persistence.*;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -74,6 +73,9 @@ public class Tarefa {
     }
 
     public void setDataFim(LocalDate dataFim) {
+        if (dataFim.isBefore(dataInicio)) {
+            throw new IllegalArgumentException("A data de fim não pode ser anterior à data de início.");
+        }
         this.dataFim = dataFim;
     }
 
