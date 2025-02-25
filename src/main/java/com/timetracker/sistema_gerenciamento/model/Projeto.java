@@ -1,11 +1,13 @@
 package com.timetracker.sistema_gerenciamento.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -16,9 +18,10 @@ public class Projeto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull
     private String nome;
 
-    @OneToMany(mappedBy = "projeto")
+    @OneToMany(mappedBy = "projeto", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Tarefa> tarefas = new ArrayList<>();
 
     private String descricao;
@@ -29,11 +32,18 @@ public class Projeto {
     @Column(name = "custo_estimado")
     private BigDecimal custoEstimado;
 
-    @Temporal(TemporalType.DATE)
-    private Date dataInicio;
+    @NotNull
+    @FutureOrPresent(message = "A data de início deve ser no presente ou futuro.")
+    private LocalDate dataInicio;
 
-    @Temporal(TemporalType.DATE)
-    private Date dataFim;
+    @NotNull
+    @FutureOrPresent(message = "A data de fim deve ser no presente ou futuro.")
+    private LocalDate dataFim;
+
+    @AssertTrue(message = "A data de fim não pode ser anterior à data de início.")
+    public boolean isDataFimValida() {
+        return dataInicio == null || dataFim == null || !dataFim.isBefore(dataInicio);
+    }
 
     @Enumerated(EnumType.STRING)
     private Status status;
@@ -53,91 +63,39 @@ public class Projeto {
     private LocalDateTime dataCriacao;
 
     // Getters e Setters
-    public Long getId() {
-        return id;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
 
-    public String getNome() {
-        return nome;
-    }
+    public String getDescricao() { return descricao; }
+    public void setDescricao(String descricao) { this.descricao = descricao; }
 
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
+    public BigDecimal getHorasEstimadas() { return horasEstimadas; }
+    public void setHorasEstimadas(BigDecimal horasEstimadas) { this.horasEstimadas = horasEstimadas; }
 
-    public String getDescricao() {
-        return descricao;
-    }
+    public BigDecimal getCustoEstimado() { return custoEstimado; }
+    public void setCustoEstimado(BigDecimal custoEstimado) { this.custoEstimado = custoEstimado; }
 
-    public void setDescricao(String descricao) {
-        this.descricao = descricao;
-    }
+    public LocalDate getDataInicio() { return dataInicio; }
+    public void setDataInicio(LocalDate dataInicio) { this.dataInicio = dataInicio; }
 
-    public BigDecimal getHorasEstimadas() {
-        return horasEstimadas;
-    }
+    public LocalDate getDataFim() { return dataFim; }
+    public void setDataFim(LocalDate dataFim) { this.dataFim = dataFim; }
 
-    public void setHorasEstimadas(BigDecimal horasEstimadas) {
-        this.horasEstimadas = horasEstimadas;
-    }
+    public Status getStatus() { return status; }
+    public void setStatus(Status status) { this.status = status; }
 
-    public BigDecimal getCustoEstimado() {
-        return custoEstimado;
-    }
+    public Prioridade getPrioridade() { return prioridade; }
+    public void setPrioridade(Prioridade prioridade) { this.prioridade = prioridade; }
 
-    public void setCustoEstimado(BigDecimal custoEstimado) {
-        this.custoEstimado = custoEstimado;
-    }
+    public Usuario getUsuarioResponsavel() { return usuarioResponsavel; }
+    public void setUsuarioResponsavel(Usuario usuarioResponsavel) { this.usuarioResponsavel = usuarioResponsavel; }
 
-    public Date getDataInicio() {
-        return dataInicio;
-    }
+    public Cliente getCliente() { return cliente; }
+    public void setCliente(Cliente cliente) { this.cliente = cliente; }
 
-    public void setDataInicio(Date dataInicio) {
-        this.dataInicio = dataInicio;
-    }
-
-    public Date getDataFim() {
-        return dataFim;
-    }
-
-    public void setDataFim(Date dataFim) {
-        this.dataFim = dataFim;
-    }
-
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
-    public Prioridade getPrioridade() {
-        return prioridade;
-    }
-
-    public void setPrioridade(Prioridade prioridade) {
-        this.prioridade = prioridade;
-    }
-
-    public Usuario getUsuarioResponsavel() {
-        return usuarioResponsavel;
-    }
-
-    public void setUsuarioResponsavel(Usuario usuarioResponsavel) {
-        this.usuarioResponsavel = usuarioResponsavel;
-    }
-
-    public Cliente getCliente() {
-        return cliente;
-    }
-
-    public void setCliente(Cliente cliente) {
-        this.cliente = cliente;
-    }
+    public LocalDateTime getDataCriacao() { return dataCriacao; }
+    public void setDataCriacao(LocalDateTime dataCriacao) { this.dataCriacao = dataCriacao; }
 }
