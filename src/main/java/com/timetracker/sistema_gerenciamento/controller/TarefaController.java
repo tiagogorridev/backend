@@ -11,7 +11,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 @RestController
 @RequestMapping("/api/tarefas")
@@ -76,6 +79,36 @@ public class TarefaController {
     public ResponseEntity<Tarefa> getTarefaDetails(@PathVariable Long idprojeto, @PathVariable Long idtarefa) {
         Tarefa tarefa = tarefaService.findTarefaById(idprojeto, idtarefa);
         return ResponseEntity.ok(tarefa);
+    }
+
+    @GetMapping("/{tarefaId}/tempo-registrado")
+    public ResponseEntity<Map<String, Object>> getTempoRegistrado(@PathVariable Long tarefaId) {
+        Tarefa tarefa = tarefaRepository.findById(tarefaId)
+                .orElseThrow(() -> new ResourceNotFoundException("Tarefa não encontrada"));
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("tarefaId", tarefa.getId());
+        response.put("nome", tarefa.getNome());
+        response.put("tempoRegistrado", tarefa.getTempoRegistrado());
+        response.put("horasEstimadas", tarefa.getHorasEstimadas());
+        response.put("percentualConcluido",
+                calcularPercentualConcluido(tarefa.getTempoRegistrado(), tarefa.getHorasEstimadas()));
+
+        return ResponseEntity.ok(response);
+    }
+
+    private double calcularPercentualConcluido(BigDecimal tempoRegistrado, BigDecimal horasEstimadas) {
+        if (horasEstimadas == null || horasEstimadas.compareTo(BigDecimal.ZERO) == 0) {
+            return 0;
+        }
+
+        if (tempoRegistrado == null) {
+            return 0;
+        }
+
+        return tempoRegistrado.multiply(new BigDecimal(100))
+                .divide(horasEstimadas, 2, BigDecimal.ROUND_HALF_UP)
+                .doubleValue();
     }
 
     @PutMapping("/detalhes/{idprojeto}/{idtarefa}")
