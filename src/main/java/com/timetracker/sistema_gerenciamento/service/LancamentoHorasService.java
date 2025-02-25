@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -51,7 +52,6 @@ public class LancamentoHorasService {
         lancamentoHoras.setHoraFim(LocalTime.parse(lancamentoHorasDTO.getHoraFim()));
         lancamentoHoras.setDescricao(lancamentoHorasDTO.getDescricao());
 
-        // Definir o status padrão como "EM_ANALISE"
         lancamentoHoras.setStatus("EM_ANALISE");
 
         return lancamentoHorasRepository.save(lancamentoHoras);
@@ -70,12 +70,31 @@ public class LancamentoHorasService {
         LancamentoHoras lancamento = lancamentoHorasRepository.findById(lancamentoId)
                 .orElseThrow(() -> new RuntimeException("Lançamento não encontrado"));
 
-        // Verificar se o status é válido
         if (!novoStatus.equals("APROVADO") && !novoStatus.equals("REJEITADO") && !novoStatus.equals("EM_ANALISE")) {
             throw new RuntimeException("Status inválido");
         }
 
+        String statusAnterior = lancamento.getStatus();
+
         lancamento.setStatus(novoStatus);
+
+        if (novoStatus.equals("APROVADO") && !statusAnterior.equals("APROVADO")) {
+            Tarefa tarefa = lancamento.getTarefa();
+            BigDecimal horasLancamento = BigDecimal.valueOf(lancamento.getHoras());
+            tarefa.adicionarTempoRegistrado(horasLancamento);
+            tarefaRepository.save(tarefa);
+        }
+        else if (statusAnterior.equals("APROVADO") && novoStatus.equals("REJEITADO")) {
+            Tarefa tarefa = lancamento.getTarefa();
+            BigDecimal horasLancamento = BigDecimal.valueOf(lancamento.getHoras());
+            BigDecimal novoTempoRegistrado = tarefa.getTempoRegistrado().subtract(horasLancamento);
+            if (novoTempoRegistrado.compareTo(BigDecimal.ZERO) < 0) {
+                novoTempoRegistrado = BigDecimal.ZERO;
+            }
+            tarefa.setTempoRegistrado(novoTempoRegistrado);
+            tarefaRepository.save(tarefa);
+        }
+
         return lancamentoHorasRepository.save(lancamento);
     }
 }
