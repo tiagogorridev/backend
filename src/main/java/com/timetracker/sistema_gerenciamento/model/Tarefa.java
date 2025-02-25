@@ -35,6 +35,9 @@ public class Tarefa {
     @Column(name = "horas_estimadas", precision = 10, scale = 2)
     private BigDecimal horasEstimadas;
 
+    @Column(name = "tempo_registrado", precision = 10, scale = 2)
+    private BigDecimal tempoRegistrado = BigDecimal.ZERO;
+
     // Getters e Setters
     public Long getId() {
         return id;
@@ -130,5 +133,20 @@ public class Tarefa {
 
     public void setHorasEstimadas(BigDecimal horasEstimadas) {
         this.horasEstimadas = horasEstimadas;
+    }
+
+    public BigDecimal getTempoRegistrado() {
+        return tempoRegistrado;
+    }
+
+    public void setTempoRegistrado(BigDecimal tempoRegistrado) {
+        this.tempoRegistrado = tempoRegistrado;
+    }
+
+    public void adicionarTempoRegistrado(BigDecimal horas) {
+        if (this.tempoRegistrado == null) {
+            this.tempoRegistrado = BigDecimal.ZERO;
+        }
+        this.tempoRegistrado = this.tempoRegistrado.add(horas);
     }
 }
