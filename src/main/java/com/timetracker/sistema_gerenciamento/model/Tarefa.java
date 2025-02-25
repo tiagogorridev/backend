@@ -64,18 +64,31 @@ public class Tarefa {
         return dataInicio;
     }
 
-    public void setDataInicio(LocalDate dataInicio) {
-        this.dataInicio = dataInicio;
-    }
-
     public LocalDate getDataFim() {
         return dataFim;
+    }
+
+    public void setDataInicio(LocalDate dataInicio) {
+        if (projeto != null) {
+            if (dataInicio.isBefore(projeto.getDataInicio()) || dataInicio.isAfter(projeto.getDataFim())) {
+                throw new IllegalArgumentException("A data de início da tarefa deve estar dentro do intervalo do projeto.");
+            }
+        }
+
+        this.dataInicio = dataInicio;
     }
 
     public void setDataFim(LocalDate dataFim) {
         if (dataFim.isBefore(dataInicio)) {
             throw new IllegalArgumentException("A data de fim não pode ser anterior à data de início.");
         }
+
+        if (projeto != null) {
+            if (dataFim.isBefore(projeto.getDataInicio()) || dataFim.isAfter(projeto.getDataFim())) {
+                throw new IllegalArgumentException("A data de fim da tarefa deve estar dentro do intervalo do projeto.");
+            }
+        }
+
         this.dataFim = dataFim;
     }
 
