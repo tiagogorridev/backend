@@ -60,6 +60,14 @@ public class ProjetoController {
             existingProjeto.setPrioridade(projeto.getPrioridade());
         }
 
+        if (projeto.getDataInicio() != null) {
+            existingProjeto.setDataInicio(projeto.getDataInicio());
+        }
+
+        if (projeto.getDataFim() != null) {
+            existingProjeto.setDataFim(projeto.getDataFim());
+        }
+
         projetoService.save(existingProjeto);
         return ResponseEntity.ok(existingProjeto);
     }
