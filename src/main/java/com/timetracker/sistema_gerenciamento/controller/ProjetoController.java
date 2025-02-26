@@ -155,4 +155,9 @@ public class ProjetoController {
 
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/getProjetos")
+    public List<Projeto> getAllProjetos() {
+        return projetoService.findAllProjetos();
+    }
 }
