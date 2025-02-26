@@ -112,4 +112,8 @@ public class ProjetoService {
         projeto.atualizarTempoRegistrado(tempoTotal);
         projetoRepository.save(projeto);
     }
+
+    public List<Projeto> findAllProjetos() {
+        return projetoRepository.findAll();
+    }
 }
