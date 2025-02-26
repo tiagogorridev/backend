@@ -7,6 +7,7 @@ import com.timetracker.sistema_gerenciamento.repository.TarefaRepository;
 import com.timetracker.sistema_gerenciamento.repository.ProjetoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -19,6 +20,9 @@ public class TarefaService {
 
     @Autowired
     private ProjetoRepository projetoRepository;
+
+    @Autowired
+    private ProjetoService projetoService;
 
     public List<Tarefa> listarTarefasPorProjeto(Long projetoId) {
         return tarefaRepository.findByProjetoId(projetoId);
@@ -69,5 +73,17 @@ public class TarefaService {
         // Implemente a lógica de busca pela tarefa usando os IDs
         return tarefaRepository.findByIdAndProjetoId(idtarefa, idprojeto)
                 .orElseThrow(() -> new ResourceNotFoundException("Tarefa não encontrada"));
+    }
+
+    @Transactional
+    public void registrarTempo(Long tarefaId, BigDecimal horas) {
+        Tarefa tarefa = tarefaRepository.findById(tarefaId)
+                .orElseThrow(() -> new ResourceNotFoundException("Tarefa não encontrada"));
+
+        tarefa.adicionarTempoRegistrado(horas);
+        tarefaRepository.save(tarefa);
+
+        // Atualiza o tempo registrado do projeto
+        projetoService.atualizarTempoRegistradoProjeto(tarefa.getProjeto().getId());
     }
 }
