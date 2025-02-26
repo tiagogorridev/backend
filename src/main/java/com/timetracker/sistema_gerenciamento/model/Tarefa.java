@@ -1,6 +1,9 @@
 package com.timetracker.sistema_gerenciamento.model;
 
+import com.timetracker.sistema_gerenciamento.service.ProjetoService;
 import jakarta.persistence.*;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
