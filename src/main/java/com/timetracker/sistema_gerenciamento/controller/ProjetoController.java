@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 @RestController
 @RequestMapping("/api/projetos")
@@ -121,5 +123,36 @@ public class ProjetoController {
 
         BigDecimal horasDisponiveis = projetoService.calcularHorasDisponiveis(id);
         return ResponseEntity.ok(horasDisponiveis);
+    }
+
+    @GetMapping("/{projetoId}/tempo-registrado")
+    public ResponseEntity<Map<String, Object>> getTempoRegistrado(@PathVariable Long projetoId) {
+        Projeto projeto = projetoService.getProjetoById(projetoId);
+        if (projeto == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        projetoService.atualizarTempoRegistradoProjeto(projetoId);
+
+        projeto = projetoService.getProjetoById(projetoId);
+
+        BigDecimal tempoRegistrado = projeto.getTempoRegistrado();
+        BigDecimal horasEstimadas = projeto.getHorasEstimadas();
+
+        double percentualConcluido = 0;
+        if (horasEstimadas != null && horasEstimadas.compareTo(BigDecimal.ZERO) > 0) {
+            percentualConcluido = tempoRegistrado.multiply(new BigDecimal(100))
+                    .divide(horasEstimadas, 2, BigDecimal.ROUND_HALF_UP)
+                    .doubleValue();
+        }
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("projetoId", projeto.getId());
+        response.put("nome", projeto.getNome());
+        response.put("tempoRegistrado", tempoRegistrado);
+        response.put("horasEstimadas", horasEstimadas);
+        response.put("percentualConcluido", percentualConcluido);
+
+        return ResponseEntity.ok(response);
     }
 }
