@@ -94,4 +94,22 @@ public class ProjetoService {
 
         return projeto.getHorasEstimadas().subtract(horasUtilizadas);
     }
+
+    @Transactional(readOnly = true)
+    public BigDecimal calcularTempoRegistrado(Long projetoId) {
+        List<Tarefa> tarefas = tarefaRepository.findByProjetoId(projetoId);
+
+        return tarefas.stream()
+                .map(Tarefa::getTempoRegistrado)
+                .filter(tempo -> tempo != null)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    @Transactional
+    public void atualizarTempoRegistradoProjeto(Long projetoId) {
+        Projeto projeto = getProjetoById(projetoId);
+        BigDecimal tempoTotal = calcularTempoRegistrado(projetoId);
+        projeto.atualizarTempoRegistrado(tempoTotal);
+        projetoRepository.save(projeto);
+    }
 }
