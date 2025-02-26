@@ -62,6 +62,21 @@ public class Projeto {
     @Column(name = "data_criacao", updatable = false)
     private LocalDateTime dataCriacao;
 
+    @Column(name = "tempo_registrado", precision = 10, scale = 2)
+    private BigDecimal tempoRegistrado = BigDecimal.ZERO;
+
+    public BigDecimal getTempoRegistrado() {
+        return tempoRegistrado;
+    }
+
+    public void setTempoRegistrado(BigDecimal tempoRegistrado) {
+        this.tempoRegistrado = tempoRegistrado;
+    }
+
+    public void atualizarTempoRegistrado(BigDecimal tempoTotal) {
+        this.tempoRegistrado = tempoTotal;
+    }
+
     // Getters e Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
