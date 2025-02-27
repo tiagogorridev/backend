@@ -1,8 +1,6 @@
 package com.timetracker.sistema_gerenciamento.controller;
 
-import com.timetracker.sistema_gerenciamento.model.Projeto;
-import com.timetracker.sistema_gerenciamento.model.Cliente;
-import com.timetracker.sistema_gerenciamento.model.Usuario;
+import com.timetracker.sistema_gerenciamento.model.*;
 import com.timetracker.sistema_gerenciamento.repository.ClienteRepository;
 import com.timetracker.sistema_gerenciamento.repository.UsuarioRepository;
 import com.timetracker.sistema_gerenciamento.service.AssociacaoUsuarioProjetoService;
@@ -10,6 +8,7 @@ import com.timetracker.sistema_gerenciamento.service.ProjetoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -95,7 +94,7 @@ public class ProjetoController {
 
     @GetMapping("/usuario/{usuarioId}/projetos")
     public ResponseEntity<List<Projeto>> getProjetosDoUsuario(@PathVariable Long usuarioId) {
-        List<Projeto> projetos = projetoService.getProjetosPorUsuario(usuarioId);
+        List<Projeto> projetos = projetoService.getProjetosAtivosDoUsuario(usuarioId);
         return ResponseEntity.ok(projetos);
     }
 
@@ -160,6 +159,21 @@ public class ProjetoController {
 
     @GetMapping("/getProjetos")
     public List<Projeto> getAllProjetos() {
-        return projetoService.findAllProjetos();
+        return projetoService.findAllProjetosAtivos();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteProjeto(@PathVariable Long id) {
+        Projeto projeto = projetoService.getProjetoById(id);
+        if (projeto == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Projeto não encontrado");
+        }
+
+        boolean deleted = projetoService.excluirProjeto(id);
+        if (deleted) {
+            return ResponseEntity.ok("Projeto excluído com sucesso");
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Falha ao excluir o projeto");
+        }
     }
 }
