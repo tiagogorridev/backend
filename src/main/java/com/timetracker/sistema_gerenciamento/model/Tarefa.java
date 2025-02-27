@@ -41,6 +41,17 @@ public class Tarefa {
     @Column(name = "tempo_registrado", precision = 10, scale = 2)
     private BigDecimal tempoRegistrado = BigDecimal.ZERO;
 
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
+    public LocalDateTime getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
     // Getters e Setters
     public Long getId() {
         return id;
