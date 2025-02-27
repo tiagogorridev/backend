@@ -96,4 +96,13 @@ public class UsuarioService {
         return passwordEncoder.matches(senhaAtual, usuario.getSenha());
     }
 
+    public void atualizarUltimoLogin(String email) {
+        Usuario usuario = buscarPorEmail(email);
+        if (usuario != null) {
+            usuario.atualizarUltimoLogin();
+            usuarioRepository.save(usuario);
+        }
+    }
+
+
 }
