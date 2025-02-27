@@ -5,6 +5,7 @@ import com.timetracker.sistema_gerenciamento.repository.ClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -44,5 +45,17 @@ public class ClienteService {
     public Cliente getClienteById(Long id) {
         return clienteRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+    }
+
+
+    public void softDeleteCliente(Long id) {
+        Cliente cliente = clienteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+
+        cliente.setDeletedAt(LocalDateTime.now());
+
+        cliente.setStatus("INATIVO");
+
+        clienteRepository.save(cliente);
     }
 }
