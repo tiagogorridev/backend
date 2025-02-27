@@ -70,7 +70,7 @@ public class LancamentoHorasService {
         LancamentoHoras lancamento = lancamentoHorasRepository.findById(lancamentoId)
                 .orElseThrow(() -> new RuntimeException("Lançamento não encontrado"));
 
-        if (!novoStatus.equals("APROVADO") && !novoStatus.equals("REJEITADO") && !novoStatus.equals("EM_ANALISE")) {
+        if (!novoStatus.equals("APROVADO") && !novoStatus.equals("REPROVADO") && !novoStatus.equals("EM_ANALISE")) {
             throw new RuntimeException("Status inválido");
         }
 
@@ -84,7 +84,8 @@ public class LancamentoHorasService {
             tarefa.adicionarTempoRegistrado(horasLancamento);
             tarefaRepository.save(tarefa);
         }
-        else if (statusAnterior.equals("APROVADO") && novoStatus.equals("REJEITADO")) {
+        else if (statusAnterior.equals("APROVADO") && novoStatus.equals("REPROVADO" +
+                "")) {
             Tarefa tarefa = lancamento.getTarefa();
             BigDecimal horasLancamento = BigDecimal.valueOf(lancamento.getHoras());
             BigDecimal novoTempoRegistrado = tarefa.getTempoRegistrado().subtract(horasLancamento);
