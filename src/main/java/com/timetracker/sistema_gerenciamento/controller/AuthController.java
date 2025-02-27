@@ -50,6 +50,7 @@ public class AuthController {
             UsernamePasswordAuthenticationToken authenticationToken =
                     new UsernamePasswordAuthenticationToken(request.getEmail(), request.getSenha());
             authenticationManager.authenticate(authenticationToken);
+            usuarioService.atualizarUltimoLogin(request.getEmail());
 
             UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
             String token = jwtUtil.generateToken(userDetails.getUsername());
