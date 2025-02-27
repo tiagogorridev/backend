@@ -60,7 +60,7 @@ public class LancamentoHorasController {
     @PutMapping("/rejeitar/{lancamentoId}")
     public ResponseEntity<LancamentoHoras> rejeitarLancamento(@PathVariable Long lancamentoId) {
         try {
-            LancamentoHoras lancamento = lancamentoHorasService.atualizarStatus(lancamentoId, "REJEITADO");
+            LancamentoHoras lancamento = lancamentoHorasService.atualizarStatus(lancamentoId, "REPROVADO");
             return ResponseEntity.ok(lancamento);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
