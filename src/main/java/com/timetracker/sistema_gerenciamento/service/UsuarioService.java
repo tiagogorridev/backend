@@ -32,6 +32,9 @@ public class UsuarioService {
             if (usuario.getPerfil() == null || usuario.getPerfil().trim().isEmpty()) {
                 usuario.setPerfil("ROLE_USER");
             }
+            if (usuario.getAtivo() == null) {
+                usuario.setAtivo(Usuario.AtivoStatus.ATIVO);
+            }
             usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
             return usuarioRepository.save(usuario);
         } catch (Exception e) {
@@ -103,6 +106,16 @@ public class UsuarioService {
             usuarioRepository.save(usuario);
         }
     }
+    public void excluirUsuario(Long id) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new UsuarioNaoEncontradoException(id));
 
+        List<UsuariosProjetos> associacoes = usuariosProjetosRepository.findByIdProjeto(id);
+        if (!associacoes.isEmpty()) {
+            usuariosProjetosRepository.deleteAll(associacoes);
+        }
 
+        usuario.setAtivo(Usuario.AtivoStatus.valueOf("INATIVO"));
+        usuarioRepository.save(usuario);
+    }
 }

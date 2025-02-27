@@ -10,6 +10,7 @@ import java.util.Optional;
 
 @Repository
 public interface UsuariosProjetosRepository extends JpaRepository<UsuariosProjetos, Long> {
+
     @Query("SELECT up FROM UsuariosProjetos up WHERE up.idUsuario = ?1 AND up.idProjeto = ?2 AND up.deletedAt IS NULL")
     Optional<UsuariosProjetos> findByIdUsuarioAndIdProjeto(Long idUsuario, Long idProjeto);
 
