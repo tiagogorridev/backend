@@ -18,4 +18,13 @@ public interface ProjetoRepository extends JpaRepository<Projeto, Long> {
 
     @Query("SELECT p FROM Projeto p JOIN FETCH p.cliente")
     List<Projeto> findAllWithClientes();
+
+    @Query("SELECT p FROM Projeto p WHERE p.deletedAt IS NULL")
+    List<Projeto> findAllActive();
+
+    List<Projeto> findByUsuarioResponsavelIdAndDeletedAtIsNull(Long usuarioId);
+
+    @Override
+    @Query("SELECT p FROM Projeto p WHERE p.id = ?1 AND p.deletedAt IS NULL")
+    Optional<Projeto> findById(Long id);
 }
