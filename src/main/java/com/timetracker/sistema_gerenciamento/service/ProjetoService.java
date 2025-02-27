@@ -1,17 +1,16 @@
 package com.timetracker.sistema_gerenciamento.service;
 
-import com.timetracker.sistema_gerenciamento.model.Tarefa;
+import com.timetracker.sistema_gerenciamento.model.*;
 import com.timetracker.sistema_gerenciamento.repository.TarefaRepository;
+import com.timetracker.sistema_gerenciamento.repository.UsuariosProjetosRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.timetracker.sistema_gerenciamento.model.Projeto;
-import com.timetracker.sistema_gerenciamento.model.Prioridade;
-import com.timetracker.sistema_gerenciamento.model.Status;
 import com.timetracker.sistema_gerenciamento.repository.ProjetoRepository;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -22,6 +21,9 @@ public class ProjetoService {
 
     @Autowired
     private TarefaRepository tarefaRepository;
+
+    @Autowired
+    private UsuariosProjetosRepository usuariosProjetosRepository;
 
     @Transactional
     public Projeto getProjetoById(Long id) {
@@ -36,6 +38,14 @@ public class ProjetoService {
     @Transactional
     public Projeto save(Projeto projeto) {
         return projetoRepository.save(projeto);
+    }
+
+    public List<Projeto> getProjetosAtivosDoUsuario(Long usuarioId) {
+        return projetoRepository.findByUsuarioResponsavelIdAndDeletedAtIsNull(usuarioId);
+    }
+
+    public List<Projeto> findAllProjetosAtivos() {
+        return projetoRepository.findAllActive();
     }
 
     @Transactional
@@ -115,5 +125,32 @@ public class ProjetoService {
 
     public List<Projeto> findAllProjetos() {
         return projetoRepository.findAll();
+    }
+
+    @Transactional
+    public boolean excluirProjeto(Long projetoId) {
+        Projeto projeto = projetoRepository.findById(projetoId).orElse(null);
+        if (projeto == null) {
+            return false;
+        }
+
+        LocalDateTime agora = LocalDateTime.now();
+
+        List<Tarefa> tarefas = tarefaRepository.findByProjetoId(projetoId);
+        for (Tarefa tarefa : tarefas) {
+            tarefa.setDeletedAt(agora);
+            tarefaRepository.save(tarefa);
+        }
+
+        List<UsuariosProjetos> associacoes = usuariosProjetosRepository.findByIdProjeto(projetoId);
+        for (UsuariosProjetos associacao : associacoes) {
+            associacao.setDeletedAt(agora);
+            usuariosProjetosRepository.save(associacao);
+        }
+
+        projeto.setDeletedAt(agora);
+        projetoRepository.save(projeto);
+
+        return true;
     }
 }
