@@ -58,10 +58,7 @@ public class UsuarioController {
     }
 
     @PutMapping("/usuarios/{id}")
-    public ResponseEntity<?> atualizarUsuario(
-            @PathVariable Long id,
-            @RequestBody Map<String, Object> requestBody
-    ) {
+    public ResponseEntity<?> atualizarUsuario(@PathVariable Long id, @RequestBody Map<String, Object> requestBody) {
         try {
             Usuario usuarioAtualizado = new Usuario();
             if (requestBody.get("nome") != null) {
@@ -76,14 +73,12 @@ public class UsuarioController {
             if (requestBody.get("senha") != null) {
                 usuarioAtualizado.setSenha((String) requestBody.get("senha"));
             }
+            if (requestBody.get("ativo") != null) {
+                usuarioAtualizado.setAtivo(Usuario.AtivoStatus.valueOf((String) requestBody.get("ativo")));
+            }
 
-            String senhaAtual = (String) requestBody.get("senhaAtual");
-
-            Usuario usuario = usuarioService.atualizarUsuario(id, usuarioAtualizado, senhaAtual);
+            Usuario usuario = usuarioService.atualizarUsuario(id, usuarioAtualizado, (String) requestBody.get("senhaAtual"));
             return ResponseEntity.ok(usuario);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of("message", e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Erro ao atualizar usuário: " + e.getMessage()));
@@ -141,6 +136,20 @@ public class UsuarioController {
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> excluirUsuario(@PathVariable Long id) {
+        try {
+            usuarioService.excluirUsuario(id);
+            return ResponseEntity.ok(Map.of("message", "Usuário excluído com sucesso"));
+        } catch (UsuarioNaoEncontradoException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "Usuário não encontrado"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Erro ao excluir usuário: " + e.getMessage()));
         }
     }
 }
