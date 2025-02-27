@@ -25,6 +25,18 @@ public class UsuariosProjetos {
     @Column(name = "data_associacao")
     private LocalDateTime dataAssociacao;
 
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
+    public LocalDateTime getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
     public Long getId() {
         return id;
     }
