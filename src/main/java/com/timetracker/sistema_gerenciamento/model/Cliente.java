@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
@@ -31,6 +32,20 @@ public class Cliente {
     @OneToMany(mappedBy = "cliente")
     @JsonIgnore
     private Set<Projeto> projetos;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
+    // Getters and setters
+
+    public LocalDateTime getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
 
     public Cliente() {
     }
