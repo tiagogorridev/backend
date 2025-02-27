@@ -45,12 +45,23 @@ public class ClienteController {
             response.put("nome", novoCliente.getNome());
             response.put("email", novoCliente.getEmail());
 
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(clienteService.adicionarCliente(cliente));
 
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Erro ao cadastrar cliente: " + e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deletarCliente(@PathVariable Long id) {
+        try {
+            clienteService.softDeleteCliente(id);
+            return ResponseEntity.ok(Map.of("message", "Cliente deletado com sucesso"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Erro ao deletar cliente: " + e.getMessage()));
         }
     }
 }
