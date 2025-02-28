@@ -33,11 +33,9 @@ public class Projeto {
     private BigDecimal custoEstimado;
 
     @NotNull
-    @FutureOrPresent(message = "A data de início deve ser no presente ou futuro.")
     private LocalDate dataInicio;
 
     @NotNull
-    @FutureOrPresent(message = "A data de fim deve ser no presente ou futuro.")
     private LocalDate dataFim;
 
     @AssertTrue(message = "A data de fim não pode ser anterior à data de início.")
