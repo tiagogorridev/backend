@@ -12,7 +12,7 @@ public class EmailService {
     @Autowired
     private JavaMailSender mailSender;
 
-    @Value("${spring.mail.username}")  // Injeta o e-mail configurado no application.properties
+    @Value("${spring.mail.username}")
     private String emailFrom;
 
     public void sendEmail(String subject, String text) {
@@ -20,11 +20,11 @@ public class EmailService {
 
         // O remetente será sempre o e-mail do Gmail configurado
         message.setFrom(emailFrom);
-        message.setTo("testeprojetowise@gmail.com");  // Destinatário fixo
+        message.setTo("testedoprojetowise@gmail.com");
         message.setSubject(subject);
         message.setText(text);
 
         // Enviar o e-mail
-        mailSender.send(message);  // Envio do e-mail
+        mailSender.send(message);
     }
 }
