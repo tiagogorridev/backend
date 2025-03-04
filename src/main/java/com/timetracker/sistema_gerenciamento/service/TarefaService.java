@@ -5,6 +5,7 @@ import com.timetracker.sistema_gerenciamento.model.Projeto;
 import com.timetracker.sistema_gerenciamento.model.Tarefa;
 import com.timetracker.sistema_gerenciamento.repository.TarefaRepository;
 import com.timetracker.sistema_gerenciamento.repository.ProjetoRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -76,23 +77,22 @@ public class TarefaService {
     }
 
     @Transactional
-    public void registrarTempo(Long tarefaId, BigDecimal horas) {
+    public Tarefa registrarTempo(Long tarefaId, BigDecimal horas) {
         Tarefa tarefa = tarefaRepository.findById(tarefaId)
-                .orElseThrow(() -> new ResourceNotFoundException("Tarefa não encontrada"));
+                .orElseThrow(() -> new EntityNotFoundException("Tarefa não encontrada"));
 
         tarefa.adicionarTempoRegistrado(horas);
         tarefa.atualizarCustoRegistrado(tarefa.getTempoRegistrado());
-        tarefaRepository.save(tarefa);
-
-        // Atualiza o tempo registrado do projeto
-        projetoService.atualizarTempoRegistradoProjeto(tarefa.getProjeto().getId());
+        return tarefaRepository.save(tarefa);
     }
 
-    // Additional method to calculate cost for a task
     public BigDecimal calcularCustoTarefa(Tarefa tarefa) {
         if (tarefa.getValorPorHora() == null || tarefa.getTempoRegistrado() == null) {
             return BigDecimal.ZERO;
         }
         return tarefa.getValorPorHora().multiply(tarefa.getTempoRegistrado());
     }
+
+
+
 }

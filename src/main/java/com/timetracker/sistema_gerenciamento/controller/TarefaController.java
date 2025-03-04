@@ -136,4 +136,15 @@ public class TarefaController {
 
         return ResponseEntity.ok(tarefaSalva);
     }
+
+
+    @PutMapping("/{tarefaId}/registrar-tempo")
+    public ResponseEntity<Tarefa> registrarTempo(
+            @PathVariable Long tarefaId,
+            @RequestBody Map<String, BigDecimal> payload
+    ) {
+        BigDecimal horas = payload.get("horas");
+        Tarefa tarefaAtualizada = tarefaService.registrarTempo(tarefaId, horas);
+        return ResponseEntity.ok(tarefaAtualizada);
+    }
 }
