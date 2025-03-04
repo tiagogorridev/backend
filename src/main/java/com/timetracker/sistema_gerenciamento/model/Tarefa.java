@@ -44,6 +44,35 @@ public class Tarefa {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
+    @Column(name = "valor_por_hora", precision = 10, scale = 2)
+    private BigDecimal valorPorHora;
+
+    @Column(name = "custo_registrado", precision = 10, scale = 2)
+    private BigDecimal custoRegistrado = BigDecimal.ZERO;
+
+    // Getters and Setters for new fields
+    public BigDecimal getValorPorHora() {
+        return valorPorHora;
+    }
+
+    public void setValorPorHora(BigDecimal valorPorHora) {
+        this.valorPorHora = valorPorHora;
+    }
+
+    public BigDecimal getCustoRegistrado() {
+        return custoRegistrado;
+    }
+
+    public void setCustoRegistrado(BigDecimal custoRegistrado) {
+        this.custoRegistrado = custoRegistrado;
+    }
+
+    public void atualizarCustoRegistrado(BigDecimal horasRegistradas) {
+        if (this.valorPorHora != null && horasRegistradas != null) {
+            this.custoRegistrado = this.valorPorHora.multiply(horasRegistradas);
+        }
+    }
+
     public LocalDateTime getDeletedAt() {
         return deletedAt;
     }

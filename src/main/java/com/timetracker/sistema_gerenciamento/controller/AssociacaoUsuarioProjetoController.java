@@ -52,4 +52,13 @@ public class AssociacaoUsuarioProjetoController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @GetMapping("/associacoes")
+    public ResponseEntity<?> listarTodasAssociacoes() {
+        try {
+            return ResponseEntity.ok(associacaoService.listarTodasAssociacoes());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
 }

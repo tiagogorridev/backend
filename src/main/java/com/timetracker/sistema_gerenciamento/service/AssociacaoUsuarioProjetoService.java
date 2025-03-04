@@ -75,4 +75,8 @@ public class AssociacaoUsuarioProjetoService {
 
         usuariosProjetosRepository.delete(associacao);
     }
+
+    public List<UsuariosProjetos> listarTodasAssociacoes() {
+        return usuariosProjetosRepository.findAll();
+    }
 }
