@@ -11,7 +11,6 @@ import com.timetracker.sistema_gerenciamento.repository.UsuariosProjetosReposito
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class UsuarioService {
@@ -114,7 +113,6 @@ public class UsuarioService {
             usuariosProjetosRepository.deleteAll(associacoes);
         }
 
-        // Soft delete
         usuario.setAtivo(Usuario.AtivoStatus.INATIVO);
         usuario.setDeletedAt(LocalDateTime.now());
         usuarioRepository.save(usuario);

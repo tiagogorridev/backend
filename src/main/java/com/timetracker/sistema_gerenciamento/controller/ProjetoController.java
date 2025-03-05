@@ -20,7 +20,6 @@ import java.util.HashMap;
 @RestController
 @RequestMapping("/api/projetos")
 public class ProjetoController {
-
     @Autowired
     private ProjetoService projetoService;
 
@@ -77,7 +76,6 @@ public class ProjetoController {
     @PostMapping
     public Projeto createProjeto(@RequestBody Projeto projeto) {
         Long usuarioId = projeto.getUsuarioResponsavel().getId();
-
         Usuario usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
@@ -108,7 +106,7 @@ public class ProjetoController {
     public ResponseEntity<Projeto> getProjeto(@PathVariable Long id) {
         Projeto projeto = projetoService.getProjetoById(id);
         if (projeto != null) {
-                projeto.getCliente().getId();
+            projeto.getCliente().getId();
             return ResponseEntity.ok(projeto);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
@@ -134,7 +132,6 @@ public class ProjetoController {
         }
 
         projetoService.atualizarTempoRegistradoProjeto(projetoId);
-
         projeto = projetoService.getProjetoById(projetoId);
 
         BigDecimal tempoRegistrado = projeto.getTempoRegistrado();

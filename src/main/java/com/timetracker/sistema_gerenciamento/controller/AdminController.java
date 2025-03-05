@@ -10,7 +10,6 @@ import java.util.Map;
 @RequestMapping("/api/admin")
 @CrossOrigin(origins = "http://localhost:4200")
 public class AdminController {
-
     @GetMapping("/dashboard")
     public ResponseEntity<?> getAdminDashboard() {
         Map<String, Object> response = new HashMap<>();

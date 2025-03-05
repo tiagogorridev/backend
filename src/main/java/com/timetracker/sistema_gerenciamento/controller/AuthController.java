@@ -22,7 +22,6 @@ import java.util.Map;
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = "http://localhost:4200")
 public class AuthController {
-
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
     private final JwtUtil jwtUtil;
@@ -45,8 +44,6 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
-            System.out.println("Tentativa de login para: " + request.getEmail());
-
             UsernamePasswordAuthenticationToken authenticationToken =
                     new UsernamePasswordAuthenticationToken(request.getEmail(), request.getSenha());
             authenticationManager.authenticate(authenticationToken);
@@ -59,16 +56,11 @@ public class AuthController {
 
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Login bem-sucedido");
-            response.put("id", usuario.getId());  // Adiciona o ID
+            response.put("id", usuario.getId());
             response.put("token", token);
             response.put("perfil", usuario.getPerfil());
 
-            System.out.println("email logado: " + request.getEmail());
-            System.out.println("token logado: " + token);
-            System.out.println("id logado: " + usuario.getId());
-
             return ResponseEntity.ok(response);
-
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("message", "Credenciais inválidas"));

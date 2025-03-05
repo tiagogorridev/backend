@@ -13,7 +13,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/lancamento")
 public class LancamentoHorasController {
-
     @Autowired
     private LancamentoHorasService lancamentoHorasService;
 
@@ -79,7 +78,6 @@ public class LancamentoHorasController {
         }
     }
 
-    // Classe interna para receber a requisição de atualização de status
     private static class StatusRequest {
         private String status;
 

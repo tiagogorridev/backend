@@ -49,14 +49,10 @@ public class TarefaController {
         if (tarefa.getProjeto() == null || tarefa.getProjeto().getId() == null) {
             throw new IllegalArgumentException("Projeto não pode ser nulo");
         }
-
         Projeto projeto = projetoRepository.findById(tarefa.getProjeto().getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Projeto não encontrado"));
-
         tarefa.setProjeto(projeto);
-
         Tarefa novaTarefa = tarefaService.salvarTarefa(tarefa);
-
         return ResponseEntity.status(HttpStatus.CREATED).body(novaTarefa);
     }
 
@@ -91,39 +87,28 @@ public class TarefaController {
         response.put("nome", tarefa.getNome());
         response.put("tempoRegistrado", tarefa.getTempoRegistrado());
         response.put("horasEstimadas", tarefa.getHorasEstimadas());
-        response.put("percentualConcluido",
-                calcularPercentualConcluido(tarefa.getTempoRegistrado(), tarefa.getHorasEstimadas()));
+        response.put("percentualConcluido", calcularPercentualConcluido(tarefa.getTempoRegistrado(), tarefa.getHorasEstimadas()));
 
         return ResponseEntity.ok(response);
     }
 
     private double calcularPercentualConcluido(BigDecimal tempoRegistrado, BigDecimal horasEstimadas) {
-        if (horasEstimadas == null || horasEstimadas.compareTo(BigDecimal.ZERO) == 0) {
+        if (horasEstimadas == null || horasEstimadas.compareTo(BigDecimal.ZERO) == 0 || tempoRegistrado == null) {
             return 0;
         }
-
-        if (tempoRegistrado == null) {
-            return 0;
-        }
-
         return tempoRegistrado.multiply(new BigDecimal(100))
                 .divide(horasEstimadas, 2, BigDecimal.ROUND_HALF_UP)
                 .doubleValue();
     }
 
     @PutMapping("/detalhes/{idprojeto}/{idtarefa}")
-    public ResponseEntity<Tarefa> updateTarefa(@PathVariable Long idprojeto,
-                                               @PathVariable Long idtarefa,
-                                               @RequestBody Tarefa tarefaAtualizada) {
-        // Verifica se o projeto existe
+    public ResponseEntity<Tarefa> updateTarefa(@PathVariable Long idprojeto, @PathVariable Long idtarefa, @RequestBody Tarefa tarefaAtualizada) {
         Projeto projeto = projetoRepository.findById(idprojeto)
                 .orElseThrow(() -> new ResourceNotFoundException("Projeto não encontrado"));
 
-        // Verifica se a tarefa existe
         Tarefa tarefa = tarefaRepository.findByIdAndProjetoId(idtarefa, idprojeto)
                 .orElseThrow(() -> new ResourceNotFoundException("Tarefa não encontrada"));
 
-        // Atualiza os dados da tarefa
         tarefa.setNome(tarefaAtualizada.getNome());
         tarefa.setDescricao(tarefaAtualizada.getDescricao());
         tarefa.setDataInicio(tarefaAtualizada.getDataInicio());
@@ -131,18 +116,13 @@ public class TarefaController {
         tarefa.setStatus(tarefaAtualizada.getStatus());
         tarefa.setHorasEstimadas(tarefaAtualizada.getHorasEstimadas());
 
-        // Salva a tarefa atualizada
         Tarefa tarefaSalva = tarefaRepository.save(tarefa);
 
         return ResponseEntity.ok(tarefaSalva);
     }
 
-
     @PutMapping("/{tarefaId}/registrar-tempo")
-    public ResponseEntity<Tarefa> registrarTempo(
-            @PathVariable Long tarefaId,
-            @RequestBody Map<String, BigDecimal> payload
-    ) {
+    public ResponseEntity<Tarefa> registrarTempo(@PathVariable Long tarefaId, @RequestBody Map<String, BigDecimal> payload) {
         BigDecimal horas = payload.get("horas");
         Tarefa tarefaAtualizada = tarefaService.registrarTempo(tarefaId, horas);
         return ResponseEntity.ok(tarefaAtualizada);

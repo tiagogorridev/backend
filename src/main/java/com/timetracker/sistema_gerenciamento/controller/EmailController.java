@@ -11,7 +11,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 @RestController
 @RequestMapping("/email")
 public class EmailController {
-
     private final EmailService emailService;
 
     @Autowired
@@ -23,7 +22,6 @@ public class EmailController {
     @PostMapping("/send")
     public ResponseEntity<String> sendEmail(@RequestBody EmailRequestDTO emailRequest) {
         try {
-            // Envia o e-mail sem precisar passar 'from' como parâmetro, pois é gerenciado pela configuração do back-end
             emailService.sendEmail(emailRequest.getSubject(), emailRequest.getMessage());
             return ResponseEntity.ok("Email enviado com sucesso!");
         } catch (MailException e) {

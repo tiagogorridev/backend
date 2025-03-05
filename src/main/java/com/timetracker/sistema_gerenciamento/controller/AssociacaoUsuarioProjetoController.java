@@ -30,9 +30,7 @@ public class AssociacaoUsuarioProjetoController {
     }
 
     @PostMapping("/{projetoId}/associar-usuario/{usuarioId}")
-    public ResponseEntity<String> associarUsuarioAoProjeto(
-            @PathVariable Long projetoId,
-            @PathVariable Long usuarioId) {
+    public ResponseEntity<String> associarUsuarioAoProjeto(@PathVariable Long projetoId, @PathVariable Long usuarioId) {
         try {
             associacaoService.associarUsuarioAoProjeto(usuarioId, projetoId);
             return ResponseEntity.ok("Usuário associado com sucesso ao projeto!");
@@ -42,9 +40,7 @@ public class AssociacaoUsuarioProjetoController {
     }
 
     @DeleteMapping("/{projetoId}/remover-usuario/{usuarioId}")
-    public ResponseEntity<String> removerUsuarioDoProjeto(
-            @PathVariable Long projetoId,
-            @PathVariable Long usuarioId) {
+    public ResponseEntity<String> removerUsuarioDoProjeto(@PathVariable Long projetoId, @PathVariable Long usuarioId) {
         try {
             associacaoService.removerUsuarioDoProjeto(usuarioId, projetoId);
             return ResponseEntity.ok("Usuário removido com sucesso do projeto!");

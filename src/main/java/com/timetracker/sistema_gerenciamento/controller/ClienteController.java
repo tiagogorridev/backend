@@ -14,7 +14,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/clientes")
 public class ClienteController {
-
     @Autowired
     private ClienteService clienteService;
 
@@ -27,8 +26,6 @@ public class ClienteController {
     @PostMapping
     public ResponseEntity<?> cadastrarCliente(@RequestBody Cliente cliente) {
         try {
-            System.out.println("Cliente recebido: Nome: " + cliente.getNome() + ", Email: " + cliente.getEmail());
-
             if (cliente == null || cliente.getEmail() == null || cliente.getEmail().trim().isEmpty()) {
                 return ResponseEntity.badRequest()
                         .body(Map.of("message", "O email do cliente não pode ser nulo ou vazio"));
@@ -40,7 +37,6 @@ public class ClienteController {
             }
 
             Cliente novoCliente = clienteService.adicionarCliente(cliente);
-
             Map<String, Object> response = new HashMap<>();
             response.put("nome", novoCliente.getNome());
             response.put("email", novoCliente.getEmail());
