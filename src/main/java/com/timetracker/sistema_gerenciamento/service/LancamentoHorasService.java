@@ -30,6 +30,7 @@ public class LancamentoHorasService {
     @Autowired
     private ProjetoRepository projetoRepository;
 
+
     @Transactional
     public LancamentoHoras salvarLancamento(LancamentoHorasDTO lancamentoHorasDTO) {
         Tarefa tarefa = tarefaRepository.findById(lancamentoHorasDTO.getIdTarefa())
@@ -87,5 +88,28 @@ public class LancamentoHorasService {
         }
 
         return lancamentoHorasRepository.save(lancamento);
+    }
+
+    public boolean checkForTimeOverlap(Long usuarioId, LocalDate data, LocalTime horaInicio, LocalTime horaFim) {
+        System.out.println("Checking time overlap for:");
+        System.out.println("User ID: " + usuarioId);
+        System.out.println("Date: " + data);
+        System.out.println("Start Time: " + horaInicio);
+        System.out.println("End Time: " + horaFim);
+
+        // Find all time entries for the user on the specified date
+        List<LancamentoHoras> existingEntries = lancamentoHorasRepository
+                .findByUsuarioIdAndDataAndStatusNot(usuarioId, data, "REPROVADO");
+
+        System.out.println("Existing entries: " + existingEntries.size());
+
+        boolean hasOverlap = existingEntries.stream().anyMatch(entry -> {
+            boolean overlap = !(horaFim.isBefore(entry.getHoraInicio()) || horaInicio.isAfter(entry.getHoraFim()));
+            System.out.println("Checking entry: " + entry.getId() + ", Overlap: " + overlap);
+            return overlap;
+        });
+
+        System.out.println("Final overlap result: " + hasOverlap);
+        return hasOverlap;
     }
 }

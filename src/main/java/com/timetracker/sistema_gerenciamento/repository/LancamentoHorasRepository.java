@@ -6,12 +6,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
 public interface LancamentoHorasRepository extends JpaRepository<LancamentoHoras, Long> {
     List<LancamentoHoras> findByUsuarioIdOrderByDataDescHoraInicioDesc(Long usuarioId);
     List<LancamentoHoras> findByStatusOrderByDataDesc(String status);
+    List<LancamentoHoras> findByUsuarioIdAndDataAndStatusNot(Long usuarioId, LocalDate data, String status);
 
     @Repository
     public interface LancamentosHorasRepository extends JpaRepository<LancamentoHoras, Long> {

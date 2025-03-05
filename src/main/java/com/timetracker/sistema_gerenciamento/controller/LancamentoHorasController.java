@@ -1,6 +1,7 @@
 package com.timetracker.sistema_gerenciamento.controller;
 
 import com.timetracker.sistema_gerenciamento.DTO.LancamentoHorasDTO;
+import com.timetracker.sistema_gerenciamento.DTO.TimeEntryOverlapRequest;
 import com.timetracker.sistema_gerenciamento.model.LancamentoHoras;
 import com.timetracker.sistema_gerenciamento.service.LancamentoHorasService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @RestController
@@ -16,15 +19,6 @@ public class LancamentoHorasController {
     @Autowired
     private LancamentoHorasService lancamentoHorasService;
 
-    @PostMapping
-    public ResponseEntity<LancamentoHoras> salvarLancamento(@RequestBody LancamentoHorasDTO lancamentoHorasDTO) {
-        try {
-            LancamentoHoras lancamentoSalvo = lancamentoHorasService.salvarLancamento(lancamentoHorasDTO);
-            return ResponseEntity.ok(lancamentoSalvo);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        }
-    }
 
     @GetMapping("/usuario/{usuarioId}")
     public ResponseEntity<List<LancamentoHoras>> getLancamentosByUsuario(@PathVariable Long usuarioId) {
@@ -87,6 +81,58 @@ public class LancamentoHorasController {
 
         public void setStatus(String status) {
             this.status = status;
+        }
+    }
+
+
+    @PostMapping("/check-overlap")
+    public ResponseEntity<Boolean> checkTimeOverlap(@RequestBody TimeEntryOverlapRequest request) {
+        // Add logging
+        System.out.println("Received overlap check request:");
+        System.out.println("User ID: " + request.getUsuarioId());
+        System.out.println("Date: " + request.getData());
+        System.out.println("Start Time: " + request.getHoraInicio());
+        System.out.println("End Time: " + request.getHoraFim());
+
+        boolean hasOverlap = lancamentoHorasService.checkForTimeOverlap(
+                request.getUsuarioId(),
+                request.getData(),
+                request.getHoraInicio(),
+                request.getHoraFim()
+        );
+
+        System.out.println("Overlap check result: " + hasOverlap);
+        return ResponseEntity.ok(hasOverlap);
+    }
+
+    // When saving a new time entry, add an overlap check
+    @PostMapping
+    public ResponseEntity<?> salvarLancamento(@RequestBody LancamentoHorasDTO lancamentoHorasDTO) {
+        try {
+            // Convert DTO data to appropriate types for overlap check
+            LocalDate data = LocalDate.parse(lancamentoHorasDTO.getData());
+            LocalTime horaInicio = LocalTime.parse(lancamentoHorasDTO.getHoraInicio());
+            LocalTime horaFim = LocalTime.parse(lancamentoHorasDTO.getHoraFim());
+
+            // Check for time overlap before saving
+            boolean hasOverlap = lancamentoHorasService.checkForTimeOverlap(
+                    lancamentoHorasDTO.getIdUsuario(),
+                    data,
+                    horaInicio,
+                    horaFim
+            );
+
+            if (hasOverlap) {
+                return ResponseEntity
+                        .status(HttpStatus.CONFLICT)
+                        .body("Já existe um lançamento de horas neste período.");
+            }
+
+            // If no overlap, proceed with saving
+            LancamentoHoras lancamentoSalvo = lancamentoHorasService.salvarLancamento(lancamentoHorasDTO);
+            return ResponseEntity.ok(lancamentoSalvo);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 }
