@@ -23,13 +23,10 @@ public class LancamentoHorasService {
 
     @Autowired
     private LancamentoHorasRepository lancamentoHorasRepository;
-
     @Autowired
     private TarefaRepository tarefaRepository;
-
     @Autowired
     private UsuarioRepository usuarioRepository;
-
     @Autowired
     private ProjetoRepository projetoRepository;
 
@@ -51,7 +48,6 @@ public class LancamentoHorasService {
         lancamentoHoras.setHoraInicio(LocalTime.parse(lancamentoHorasDTO.getHoraInicio()));
         lancamentoHoras.setHoraFim(LocalTime.parse(lancamentoHorasDTO.getHoraFim()));
         lancamentoHoras.setDescricao(lancamentoHorasDTO.getDescricao());
-
         lancamentoHoras.setStatus("EM_ANALISE");
 
         return lancamentoHorasRepository.save(lancamentoHoras);
@@ -75,7 +71,6 @@ public class LancamentoHorasService {
         }
 
         String statusAnterior = lancamento.getStatus();
-
         lancamento.setStatus(novoStatus);
 
         if (novoStatus.equals("APROVADO") && !statusAnterior.equals("APROVADO")) {
@@ -83,16 +78,11 @@ public class LancamentoHorasService {
             BigDecimal horasLancamento = BigDecimal.valueOf(lancamento.getHoras());
             tarefa.adicionarTempoRegistrado(horasLancamento);
             tarefaRepository.save(tarefa);
-        }
-        else if (statusAnterior.equals("APROVADO") && novoStatus.equals("REPROVADO" +
-                "")) {
+        } else if (statusAnterior.equals("APROVADO") && novoStatus.equals("REPROVADO")) {
             Tarefa tarefa = lancamento.getTarefa();
             BigDecimal horasLancamento = BigDecimal.valueOf(lancamento.getHoras());
             BigDecimal novoTempoRegistrado = tarefa.getTempoRegistrado().subtract(horasLancamento);
-            if (novoTempoRegistrado.compareTo(BigDecimal.ZERO) < 0) {
-                novoTempoRegistrado = BigDecimal.ZERO;
-            }
-            tarefa.setTempoRegistrado(novoTempoRegistrado);
+            tarefa.setTempoRegistrado(novoTempoRegistrado.compareTo(BigDecimal.ZERO) < 0 ? BigDecimal.ZERO : novoTempoRegistrado);
             tarefaRepository.save(tarefa);
         }
 

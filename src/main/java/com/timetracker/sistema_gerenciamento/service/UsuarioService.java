@@ -4,9 +4,9 @@ import com.timetracker.sistema_gerenciamento.exception.UsuarioNaoEncontradoExcep
 import com.timetracker.sistema_gerenciamento.model.Usuario;
 import com.timetracker.sistema_gerenciamento.model.UsuariosProjetos;
 import com.timetracker.sistema_gerenciamento.repository.UsuarioRepository;
+import com.timetracker.sistema_gerenciamento.repository.UsuariosProjetosRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import com.timetracker.sistema_gerenciamento.repository.UsuariosProjetosRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,27 +19,21 @@ public class UsuarioService {
     private final UsuariosProjetosRepository usuariosProjetosRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UsuarioService(UsuarioRepository usuarioRepository,
-                          UsuariosProjetosRepository usuariosProjetosRepository,
-                          PasswordEncoder passwordEncoder) {
+    public UsuarioService(UsuarioRepository usuarioRepository, UsuariosProjetosRepository usuariosProjetosRepository, PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
         this.usuariosProjetosRepository = usuariosProjetosRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
     public Usuario salvarUsuario(Usuario usuario) {
-        try {
-            if (usuario.getPerfil() == null || usuario.getPerfil().trim().isEmpty()) {
-                usuario.setPerfil("ROLE_USER");
-            }
-            if (usuario.getAtivo() == null) {
-                usuario.setAtivo(Usuario.AtivoStatus.ATIVO);
-            }
-            usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
-            return usuarioRepository.save(usuario);
-        } catch (Exception e) {
-            throw new RuntimeException("Erro ao salvar o usuário: " + e.getMessage(), e);
+        if (usuario.getPerfil() == null || usuario.getPerfil().trim().isEmpty()) {
+            usuario.setPerfil("ROLE_USER");
         }
+        if (usuario.getAtivo() == null) {
+            usuario.setAtivo(Usuario.AtivoStatus.ATIVO);
+        }
+        usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
+        return usuarioRepository.save(usuario);
     }
 
     public Usuario buscarPorEmail(String email) {
@@ -52,10 +46,7 @@ public class UsuarioService {
 
     public boolean verificarCredenciais(String email, String senhaDigitada) {
         Usuario usuario = buscarPorEmail(email);
-        if (usuario == null) {
-            return false;
-        }
-        return passwordEncoder.matches(senhaDigitada, usuario.getSenha());
+        return usuario != null && passwordEncoder.matches(senhaDigitada, usuario.getSenha());
     }
 
     public List<Usuario> listarTodosUsuarios() {
@@ -76,16 +67,9 @@ public class UsuarioService {
             }
             usuarioExistente.setSenha(passwordEncoder.encode(usuarioAtualizado.getSenha()));
         }
-
-        if (usuarioAtualizado.getNome() != null) {
-            usuarioExistente.setNome(usuarioAtualizado.getNome());
-        }
-        if (usuarioAtualizado.getEmail() != null) {
-            usuarioExistente.setEmail(usuarioAtualizado.getEmail());
-        }
-        if (usuarioAtualizado.getPerfil() != null) {
-            usuarioExistente.setPerfil(usuarioAtualizado.getPerfil());
-        }
+        if (usuarioAtualizado.getNome() != null) usuarioExistente.setNome(usuarioAtualizado.getNome());
+        if (usuarioAtualizado.getEmail() != null) usuarioExistente.setEmail(usuarioAtualizado.getEmail());
+        if (usuarioAtualizado.getPerfil() != null) usuarioExistente.setPerfil(usuarioAtualizado.getPerfil());
 
         return usuarioRepository.save(usuarioExistente);
     }
@@ -93,7 +77,6 @@ public class UsuarioService {
     public boolean verificarSenhaAtual(Long id, String senhaAtual) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new UsuarioNaoEncontradoException(id));
-
         return passwordEncoder.matches(senhaAtual, usuario.getSenha());
     }
 
@@ -104,6 +87,7 @@ public class UsuarioService {
             usuarioRepository.save(usuario);
         }
     }
+
     public void excluirUsuario(Long id) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new UsuarioNaoEncontradoException(id));

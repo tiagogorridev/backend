@@ -18,13 +18,11 @@ public class EmailService {
     public void sendEmail(String subject, String text) {
         SimpleMailMessage message = new SimpleMailMessage();
 
-        // O remetente será sempre o e-mail do Gmail configurado
         message.setFrom(emailFrom);
         message.setTo("testedoprojetowise@gmail.com");
         message.setSubject(subject);
         message.setText(text);
 
-        // Enviar o e-mail
         mailSender.send(message);
     }
 }

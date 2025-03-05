@@ -109,12 +109,16 @@ public class TarefaController {
         Tarefa tarefa = tarefaRepository.findByIdAndProjetoId(idtarefa, idprojeto)
                 .orElseThrow(() -> new ResourceNotFoundException("Tarefa não encontrada"));
 
+        // Prevent manual setting of custoRegistrado
+        tarefaAtualizada.setCustoRegistrado(tarefa.getCustoRegistrado());
+
         tarefa.setNome(tarefaAtualizada.getNome());
         tarefa.setDescricao(tarefaAtualizada.getDescricao());
         tarefa.setDataInicio(tarefaAtualizada.getDataInicio());
         tarefa.setDataFim(tarefaAtualizada.getDataFim());
         tarefa.setStatus(tarefaAtualizada.getStatus());
         tarefa.setHorasEstimadas(tarefaAtualizada.getHorasEstimadas());
+        tarefa.setValorPorHora(tarefaAtualizada.getValorPorHora());
 
         Tarefa tarefaSalva = tarefaRepository.save(tarefa);
 
@@ -124,7 +128,22 @@ public class TarefaController {
     @PutMapping("/{tarefaId}/registrar-tempo")
     public ResponseEntity<Tarefa> registrarTempo(@PathVariable Long tarefaId, @RequestBody Map<String, BigDecimal> payload) {
         BigDecimal horas = payload.get("horas");
+
+        // Add logging
+        System.out.println("Registrando tempo para tarefa: " + tarefaId);
+        System.out.println("Horas a registrar: " + horas);
+
+        // Validate input
+        if (horas == null || horas.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Horas inválidas. Deve ser um valor positivo.");
+        }
+
         Tarefa tarefaAtualizada = tarefaService.registrarTempo(tarefaId, horas);
+
+        // Additional logging to verify update
+        System.out.println("Tempo registrado: " + tarefaAtualizada.getTempoRegistrado());
+        System.out.println("Custo registrado: " + tarefaAtualizada.getCustoRegistrado());
+
         return ResponseEntity.ok(tarefaAtualizada);
     }
 }

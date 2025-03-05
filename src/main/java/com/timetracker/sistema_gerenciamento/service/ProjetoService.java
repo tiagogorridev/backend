@@ -1,13 +1,13 @@
 package com.timetracker.sistema_gerenciamento.service;
 
+import com.timetracker.sistema_gerenciamento.exception.ResourceNotFoundException;
 import com.timetracker.sistema_gerenciamento.model.*;
 import com.timetracker.sistema_gerenciamento.repository.TarefaRepository;
 import com.timetracker.sistema_gerenciamento.repository.UsuariosProjetosRepository;
+import com.timetracker.sistema_gerenciamento.repository.ProjetoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.timetracker.sistema_gerenciamento.repository.ProjetoRepository;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -53,6 +53,12 @@ public class ProjetoService {
         Projeto projetoExistente = projetoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Projeto não encontrado"));
 
+        atualizarDadosProjeto(projetoDetails, projetoExistente);
+
+        return projetoRepository.save(projetoExistente);
+    }
+
+    private void atualizarDadosProjeto(Projeto projetoDetails, Projeto projetoExistente) {
         if (projetoDetails.getNome() != null && !projetoDetails.getNome().isEmpty()) {
             projetoExistente.setNome(projetoDetails.getNome());
         }
@@ -76,17 +82,11 @@ public class ProjetoService {
         if (projetoDetails.getPrioridade() != null) {
             projetoExistente.setPrioridade(projetoDetails.getPrioridade());
         }
-
-        Projeto projetoAtualizado = projetoRepository.save(projetoExistente);
-        projetoRepository.flush();
-
-        return projetoAtualizado;
     }
 
     public List<Projeto> findByUsuarioId(Long usuarioId) {
-        return projetoRepository.findByUsuarioResponsavelId(usuarioId);  // Correção
+        return projetoRepository.findByUsuarioResponsavelId(usuarioId);
     }
-
 
     @Transactional(readOnly = true)
     public BigDecimal calcularHorasDisponiveis(Long projetoId) {
@@ -95,9 +95,7 @@ public class ProjetoService {
             return BigDecimal.ZERO;
         }
 
-        List<Tarefa> tarefas = tarefaRepository.findByProjetoId(projetoId);
-
-        BigDecimal horasUtilizadas = tarefas.stream()
+        BigDecimal horasUtilizadas = tarefaRepository.findByProjetoId(projetoId).stream()
                 .map(Tarefa::getHorasEstimadas)
                 .filter(horas -> horas != null)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -107,20 +105,10 @@ public class ProjetoService {
 
     @Transactional(readOnly = true)
     public BigDecimal calcularTempoRegistrado(Long projetoId) {
-        List<Tarefa> tarefas = tarefaRepository.findByProjetoId(projetoId);
-
-        return tarefas.stream()
+        return tarefaRepository.findByProjetoId(projetoId).stream()
                 .map(Tarefa::getTempoRegistrado)
                 .filter(tempo -> tempo != null)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
-
-    @Transactional
-    public void atualizarTempoRegistradoProjeto(Long projetoId) {
-        Projeto projeto = getProjetoById(projetoId);
-        BigDecimal tempoTotal = calcularTempoRegistrado(projetoId);
-        projeto.atualizarTempoRegistrado(tempoTotal);
-        projetoRepository.save(projeto);
     }
 
     public List<Projeto> findAllProjetos() {
@@ -137,20 +125,71 @@ public class ProjetoService {
         LocalDateTime agora = LocalDateTime.now();
 
         List<Tarefa> tarefas = tarefaRepository.findByProjetoId(projetoId);
-        for (Tarefa tarefa : tarefas) {
+        tarefas.forEach(tarefa -> {
             tarefa.setDeletedAt(agora);
             tarefaRepository.save(tarefa);
-        }
+        });
 
         List<UsuariosProjetos> associacoes = usuariosProjetosRepository.findByIdProjeto(projetoId);
-        for (UsuariosProjetos associacao : associacoes) {
+        associacoes.forEach(associacao -> {
             associacao.setDeletedAt(agora);
             usuariosProjetosRepository.save(associacao);
-        }
+        });
 
         projeto.setDeletedAt(agora);
         projetoRepository.save(projeto);
 
         return true;
+    }
+
+    @Transactional
+    public Tarefa registrarTempo(Long tarefaId, BigDecimal horas) {
+        Tarefa tarefa = tarefaRepository.findById(tarefaId)
+                .orElseThrow(() -> new ResourceNotFoundException("Tarefa não encontrada"));
+
+        tarefa.adicionarTempoRegistrado(horas);
+        tarefa.atualizarCustoRegistrado(tarefa.getTempoRegistrado());
+        Tarefa savedTarefa = tarefaRepository.save(tarefa);
+
+        // Recalculate and update project's registered cost
+        Projeto projeto = savedTarefa.getProjeto();
+        BigDecimal custoTotal = tarefaRepository.findByProjetoId(projeto.getId()).stream()
+                .map(Tarefa::getCustoRegistrado)
+                .filter(custo -> custo != null)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        projeto.setCustoRegistrado(custoTotal);
+        projetoRepository.save(projeto);
+
+        return savedTarefa;
+    }
+
+    // Modify this method to also recalculate project cost
+    @Transactional
+    public void atualizarTempoRegistradoProjeto(Long projetoId) {
+        Projeto projeto = getProjetoById(projetoId);
+        BigDecimal tempoTotal = calcularTempoRegistrado(projetoId);
+        projeto.atualizarTempoRegistrado(tempoTotal);
+
+        // Recalculate project's registered cost
+        BigDecimal custoTotal = tarefaRepository.findByProjetoId(projetoId).stream()
+                .map(Tarefa::getCustoRegistrado)
+                .filter(custo -> custo != null)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        projeto.setCustoRegistrado(custoTotal);
+        projetoRepository.save(projeto);
+    }
+
+    @Transactional
+    public void atualizarCustoRegistradoProjeto(Long projetoId) {
+        Projeto projeto = getProjetoById(projetoId);
+        BigDecimal custoTotal = tarefaRepository.findByProjetoId(projetoId).stream()
+                .map(Tarefa::getCustoRegistrado)
+                .filter(custo -> custo != null)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        projeto.setCustoRegistrado(custoTotal);
+        projetoRepository.save(projeto);
     }
 }

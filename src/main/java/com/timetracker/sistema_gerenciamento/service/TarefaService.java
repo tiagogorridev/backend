@@ -5,7 +5,6 @@ import com.timetracker.sistema_gerenciamento.model.Projeto;
 import com.timetracker.sistema_gerenciamento.model.Tarefa;
 import com.timetracker.sistema_gerenciamento.repository.TarefaRepository;
 import com.timetracker.sistema_gerenciamento.repository.ProjetoRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,7 +62,7 @@ public class TarefaService {
         List<Tarefa> tarefas = tarefaRepository.findByProjetoId(projetoId);
 
         BigDecimal horasUtilizadas = tarefas.stream()
-                .map(tarefa -> tarefa.getHorasEstimadas())
+                .map(Tarefa::getHorasEstimadas)
                 .filter(horas -> horas != null)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -71,7 +70,6 @@ public class TarefaService {
     }
 
     public Tarefa findTarefaById(Long idprojeto, Long idtarefa) {
-        // Implemente a lógica de busca pela tarefa usando os IDs
         return tarefaRepository.findByIdAndProjetoId(idtarefa, idprojeto)
                 .orElseThrow(() -> new ResourceNotFoundException("Tarefa não encontrada"));
     }
@@ -79,10 +77,26 @@ public class TarefaService {
     @Transactional
     public Tarefa registrarTempo(Long tarefaId, BigDecimal horas) {
         Tarefa tarefa = tarefaRepository.findById(tarefaId)
-                .orElseThrow(() -> new EntityNotFoundException("Tarefa não encontrada"));
+                .orElseThrow(() -> new ResourceNotFoundException("Tarefa não encontrada"));
+
+        // Validate valor por hora
+        if (tarefa.getValorPorHora() == null) {
+            throw new IllegalStateException("Valor por hora não definido para a tarefa");
+        }
+
+        // Validate input
+        if (horas == null || horas.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Horas inválidas. Deve ser um valor positivo.");
+        }
 
         tarefa.adicionarTempoRegistrado(horas);
         tarefa.atualizarCustoRegistrado(tarefa.getTempoRegistrado());
+
+        // Log for debugging
+        System.out.println("Tempo registrado: " + tarefa.getTempoRegistrado());
+        System.out.println("Valor por hora: " + tarefa.getValorPorHora());
+        System.out.println("Custo registrado: " + tarefa.getCustoRegistrado());
+
         return tarefaRepository.save(tarefa);
     }
 
@@ -92,7 +106,4 @@ public class TarefaService {
         }
         return tarefa.getValorPorHora().multiply(tarefa.getTempoRegistrado());
     }
-
-
-
 }

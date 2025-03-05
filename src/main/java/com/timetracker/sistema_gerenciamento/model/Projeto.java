@@ -2,7 +2,6 @@ package com.timetracker.sistema_gerenciamento.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.AssertTrue;
-import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -31,6 +30,9 @@ public class Projeto {
 
     @Column(name = "custo_estimado")
     private BigDecimal custoEstimado;
+
+    @Column(name = "custo_registrado", precision = 10, scale = 2)
+    private BigDecimal custoRegistrado = BigDecimal.ZERO;
 
     @NotNull
     private LocalDate dataInicio;
@@ -75,6 +77,14 @@ public class Projeto {
         this.tempoRegistrado = tempoTotal;
     }
 
+    public BigDecimal getCustoRegistrado() {
+        return custoRegistrado;
+    }
+
+    public void setCustoRegistrado(BigDecimal custoRegistrado) {
+        this.custoRegistrado = custoRegistrado;
+    }
+
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
@@ -85,8 +95,6 @@ public class Projeto {
     public void setDeletedAt(LocalDateTime deletedAt) {
         this.deletedAt = deletedAt;
     }
-
-
     // Getters e Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
