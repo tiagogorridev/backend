@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -51,8 +52,13 @@ public class TarefaService {
         return tarefaRepository.findByProjetoId(projectId);
     }
 
+    @Transactional
     public void deleteTarefa(Long id) {
-        tarefaRepository.deleteById(id);
+        Tarefa tarefa = tarefaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Tarefa não encontrada"));
+
+        tarefa.setDeletedAt(LocalDateTime.now());
+        tarefaRepository.save(tarefa);
     }
 
     private BigDecimal calcularHorasDisponiveisProjeto(Long projetoId) {
