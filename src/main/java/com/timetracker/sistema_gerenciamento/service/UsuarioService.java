@@ -8,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.timetracker.sistema_gerenciamento.repository.UsuariosProjetosRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -16,14 +17,14 @@ import java.util.stream.Collectors;
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
-    private final UsuariosProjetosRepository usuariosProjetosRepository;  // Adicionando a referência ao repositório
+    private final UsuariosProjetosRepository usuariosProjetosRepository;
     private final PasswordEncoder passwordEncoder;
 
     public UsuarioService(UsuarioRepository usuarioRepository,
                           UsuariosProjetosRepository usuariosProjetosRepository,
                           PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
-        this.usuariosProjetosRepository = usuariosProjetosRepository;  // Inicializando o repositório
+        this.usuariosProjetosRepository = usuariosProjetosRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -62,10 +63,8 @@ public class UsuarioService {
         return usuarioRepository.findAll();
     }
 
-    public List<String> getEmails() {
-        return usuarioRepository.findAll().stream()
-                .map(Usuario::getEmail)
-                .collect(Collectors.toList());
+    public List<Usuario> listarUsuariosAtivos() {
+        return usuarioRepository.findByAtivo(Usuario.AtivoStatus.ATIVO);
     }
 
     public Usuario atualizarUsuario(Long id, Usuario usuarioAtualizado, String senhaAtual) {
@@ -115,7 +114,9 @@ public class UsuarioService {
             usuariosProjetosRepository.deleteAll(associacoes);
         }
 
-        usuario.setAtivo(Usuario.AtivoStatus.valueOf("INATIVO"));
+        // Soft delete
+        usuario.setAtivo(Usuario.AtivoStatus.INATIVO);
+        usuario.setDeletedAt(LocalDateTime.now());
         usuarioRepository.save(usuario);
     }
 }

@@ -120,6 +120,17 @@ public class Usuario implements UserDetails {
         this.perfil = perfil;
     }
 
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
+    public LocalDateTime getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
     @PrePersist
     public void prePersist() {
         if (dataCriacao == null) {

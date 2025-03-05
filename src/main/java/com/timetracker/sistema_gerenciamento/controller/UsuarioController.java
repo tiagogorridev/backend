@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -53,7 +54,9 @@ public class UsuarioController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/emails")
     public ResponseEntity<List<String>> getEmails() {
-        List<String> emails = usuarioService.getEmails();
+        List<String> emails = usuarioService.listarUsuariosAtivos().stream()
+                .map(Usuario::getEmail)
+                .collect(Collectors.toList());
         return ResponseEntity.ok(emails);
     }
 
