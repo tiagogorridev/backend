@@ -130,7 +130,7 @@ public class TarefaController {
     public ResponseEntity<Tarefa> registrarTempo(@PathVariable Long tarefaId, @RequestBody Map<String, BigDecimal> payload) {
         BigDecimal horas = payload.get("horas");
 
-        // Add logging
+        // Add extra logging
         System.out.println("Registrando tempo para tarefa: " + tarefaId);
         System.out.println("Horas a registrar: " + horas);
 
@@ -141,9 +141,13 @@ public class TarefaController {
 
         Tarefa tarefaAtualizada = tarefaService.registrarTempo(tarefaId, horas);
 
-        // Additional logging to verify update
+        // Add logging to verify valores
         System.out.println("Tempo registrado: " + tarefaAtualizada.getTempoRegistrado());
+        System.out.println("Valor por hora: " + tarefaAtualizada.getValorPorHora());
         System.out.println("Custo registrado: " + tarefaAtualizada.getCustoRegistrado());
+
+        // Add additional call to ensure project cost is updated
+        projetoService.atualizarCustoRegistradoProjeto(tarefaAtualizada.getProjeto().getId());
 
         return ResponseEntity.ok(tarefaAtualizada);
     }

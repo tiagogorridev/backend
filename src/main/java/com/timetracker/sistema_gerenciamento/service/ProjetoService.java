@@ -183,10 +183,11 @@ public class ProjetoService {
 
     @Transactional
     public void atualizarCustoRegistradoProjeto(Long projetoId) {
-        // Adicione logs para depuração
         System.out.println("Iniciando atualização de custo para projeto: " + projetoId);
 
-        Projeto projeto = getProjetoById(projetoId);
+        // Get a fresh instance of the project
+        Projeto projeto = projetoRepository.findById(projetoId)
+                .orElseThrow(() -> new RuntimeException("Projeto não encontrado"));
 
         List<Tarefa> tarefas = tarefaRepository.findByProjetoId(projetoId);
         System.out.println("Tarefas encontradas: " + tarefas.size());
@@ -202,8 +203,8 @@ public class ProjetoService {
         System.out.println("Custo total calculado: " + custoTotal);
         projeto.setCustoRegistrado(custoTotal);
 
-        // Salve explicitamente
-        Projeto projetoSalvo = projetoRepository.save(projeto);
+        // Force flush to database
+        Projeto projetoSalvo = projetoRepository.saveAndFlush(projeto);
         System.out.println("Projeto salvo com custo: " + projetoSalvo.getCustoRegistrado());
     }
 }

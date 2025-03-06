@@ -29,6 +29,8 @@ public class LancamentoHorasService {
     private UsuarioRepository usuarioRepository;
     @Autowired
     private ProjetoRepository projetoRepository;
+    @Autowired
+    private ProjetoService projetoService;
 
 
     @Transactional
@@ -78,13 +80,31 @@ public class LancamentoHorasService {
             Tarefa tarefa = lancamento.getTarefa();
             BigDecimal horasLancamento = BigDecimal.valueOf(lancamento.getHoras());
             tarefa.adicionarTempoRegistrado(horasLancamento);
+
+            // Recalcular o custo registrado
+            if (tarefa.getValorPorHora() != null) {
+                tarefa.atualizarCustoRegistrado(tarefa.getTempoRegistrado());
+            }
+
             tarefaRepository.save(tarefa);
+
+            // Atualizar o custo do projeto também
+            projetoService.atualizarCustoRegistradoProjeto(lancamento.getProjeto().getId());
         } else if (statusAnterior.equals("APROVADO") && novoStatus.equals("REPROVADO")) {
             Tarefa tarefa = lancamento.getTarefa();
             BigDecimal horasLancamento = BigDecimal.valueOf(lancamento.getHoras());
             BigDecimal novoTempoRegistrado = tarefa.getTempoRegistrado().subtract(horasLancamento);
             tarefa.setTempoRegistrado(novoTempoRegistrado.compareTo(BigDecimal.ZERO) < 0 ? BigDecimal.ZERO : novoTempoRegistrado);
+
+            // Recalcular o custo registrado após remover horas
+            if (tarefa.getValorPorHora() != null) {
+                tarefa.atualizarCustoRegistrado(tarefa.getTempoRegistrado());
+            }
+
             tarefaRepository.save(tarefa);
+
+            // Atualizar o custo do projeto
+            projetoService.atualizarCustoRegistradoProjeto(lancamento.getProjeto().getId());
         }
 
         return lancamentoHorasRepository.save(lancamento);

@@ -7,6 +7,7 @@ import com.timetracker.sistema_gerenciamento.repository.TarefaRepository;
 import com.timetracker.sistema_gerenciamento.repository.ProjetoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -104,9 +105,11 @@ public class TarefaService {
 
         // Salvar a tarefa
         Tarefa tarefaSalva = tarefaRepository.save(tarefa);
+        tarefaRepository.flush();
 
         // Atualizar o custo do projeto
         projetoService.atualizarCustoRegistradoProjeto(tarefa.getProjeto().getId());
+        atualizarCustoProjetoEmNovaTransacao(tarefa.getProjeto().getId());
 
         // Log for debugging
         System.out.println("Tempo registrado: " + tarefaSalva.getTempoRegistrado());
@@ -121,5 +124,10 @@ public class TarefaService {
             return BigDecimal.ZERO;
         }
         return tarefa.getValorPorHora().multiply(tarefa.getTempoRegistrado());
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void atualizarCustoProjetoEmNovaTransacao(Long projetoId) {
+        projetoService.atualizarCustoRegistradoProjeto(projetoId);
     }
 }
