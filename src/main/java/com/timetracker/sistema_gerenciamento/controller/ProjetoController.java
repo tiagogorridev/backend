@@ -172,6 +172,12 @@ public class ProjetoController {
         return projetoService.findAllProjetosAtivos();
     }
 
+    // Endpoint para obter projetos associados a um usuário
+    @GetMapping("/usuarios/{usuarioId}/projetos")
+    public List<Projeto> getProjetosPorUsuario(@PathVariable Long usuarioId) {
+        return projetoService.findProjetosByUsuario(usuarioId);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteProjeto(@PathVariable Long id) {
         Projeto projeto = projetoService.getProjetoById(id);

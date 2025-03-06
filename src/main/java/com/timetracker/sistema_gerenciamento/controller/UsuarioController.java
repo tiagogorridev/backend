@@ -1,7 +1,9 @@
 package com.timetracker.sistema_gerenciamento.controller;
 
 import com.timetracker.sistema_gerenciamento.exception.UsuarioNaoEncontradoException;
+import com.timetracker.sistema_gerenciamento.model.Projeto;
 import com.timetracker.sistema_gerenciamento.model.Usuario;
+import com.timetracker.sistema_gerenciamento.repository.UsuariosProjetosRepository;
 import com.timetracker.sistema_gerenciamento.service.AssociacaoUsuarioProjetoService;
 import com.timetracker.sistema_gerenciamento.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,9 @@ public class UsuarioController {
 
     @Autowired
     private UsuarioService usuarioService;
+
+    @Autowired
+    private AssociacaoUsuarioProjetoService associacaoUsuarioProjetoService;
 
     @GetMapping
     public ResponseEntity<List<Usuario>> listarTodosUsuarios() {
@@ -153,6 +158,16 @@ public class UsuarioController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Erro ao excluir usuário: " + e.getMessage()));
+        }
+    }
+
+    @GetMapping("/usuarios/{usuarioId}/projetos")
+    public ResponseEntity<List<Projeto>> getProjetosPorUsuario(@PathVariable Long usuarioId) {
+        try {
+            List<Projeto> projetos = associacaoUsuarioProjetoService.getProjetosPorUsuario(usuarioId);
+            return ResponseEntity.ok(projetos);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 }

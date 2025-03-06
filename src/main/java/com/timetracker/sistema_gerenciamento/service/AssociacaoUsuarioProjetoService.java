@@ -114,4 +114,10 @@ public class AssociacaoUsuarioProjetoService {
                 .map(Usuario::getEmail)
                 .collect(Collectors.toList());
     }
+
+
+    public List<Projeto> getProjetosPorUsuario(Long usuarioId) {
+        // Chama o repositório para buscar os projetos do usuário
+        return usuariosProjetosRepository.findProjetosByUsuarioId(usuarioId);
+    }
 }

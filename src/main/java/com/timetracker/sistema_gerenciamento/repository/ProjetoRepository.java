@@ -22,6 +22,9 @@ public interface ProjetoRepository extends JpaRepository<Projeto, Long> {
     @Query("SELECT p FROM Projeto p WHERE p.deletedAt IS NULL")
     List<Projeto> findAllActive();
 
+    @Query("SELECT p FROM Projeto p WHERE p.deletedAt IS NULL AND (p.usuarioResponsavel.id = :usuarioId OR :usuarioId IN (SELECT u.id FROM p.usuarios u))")
+    List<Projeto> findProjetosByUsuario(@Param("usuarioId") Long usuarioId);
+
     List<Projeto> findByUsuarioResponsavelIdAndDeletedAtIsNull(Long usuarioId);
 
     @Override

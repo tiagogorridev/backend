@@ -1,8 +1,10 @@
 package com.timetracker.sistema_gerenciamento.repository;
 
+import com.timetracker.sistema_gerenciamento.model.Projeto;
 import com.timetracker.sistema_gerenciamento.model.UsuariosProjetos;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -22,4 +24,7 @@ public interface UsuariosProjetosRepository extends JpaRepository<UsuariosProjet
 
     @Query("SELECT CASE WHEN COUNT(up) > 0 THEN true ELSE false END FROM UsuariosProjetos up WHERE up.idUsuario = ?1 AND up.idProjeto = ?2 AND up.deletedAt IS NULL")
     boolean existsByIdUsuarioAndIdProjeto(Long idUsuario, Long idProjeto);
+
+    @Query("SELECT p FROM Projeto p JOIN p.usuarios u WHERE u.id = :usuarioId")
+    List<Projeto> findProjetosByUsuarioId(@Param("usuarioId") Long usuarioId);
 }

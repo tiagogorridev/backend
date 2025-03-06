@@ -1,6 +1,7 @@
 package com.timetracker.sistema_gerenciamento.service;
 
 import com.timetracker.sistema_gerenciamento.exception.UsuarioNaoEncontradoException;
+import com.timetracker.sistema_gerenciamento.model.Projeto;
 import com.timetracker.sistema_gerenciamento.model.Usuario;
 import com.timetracker.sistema_gerenciamento.model.UsuariosProjetos;
 import com.timetracker.sistema_gerenciamento.repository.UsuarioRepository;

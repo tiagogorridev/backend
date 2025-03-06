@@ -48,6 +48,10 @@ public class ProjetoService {
         return projetoRepository.findAllActive();
     }
 
+    public List<Projeto> findProjetosByUsuario(Long usuarioId) {
+        return projetoRepository.findProjetosByUsuario(usuarioId);
+    }
+
     @Transactional
     public Projeto atualizarProjeto(Long id, Projeto projetoDetails) {
         Projeto projetoExistente = projetoRepository.findById(id)

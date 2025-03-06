@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "projetos")
@@ -54,6 +55,23 @@ public class Projeto {
     @ManyToOne
     @JoinColumn(name = "id_usuario_responsavel")
     private Usuario usuarioResponsavel;
+
+
+    @ManyToMany
+    @JoinTable(
+            name = "usuarios_projetos",
+            joinColumns = @JoinColumn(name = "id_projeto"),
+            inverseJoinColumns = @JoinColumn(name = "id_usuario")
+    )
+    private Set<Usuario> usuarios;
+
+    public Set<Usuario> getUsuarios() {
+        return usuarios;
+    }
+
+    public void setUsuarios(Set<Usuario> usuarios) {
+        this.usuarios = usuarios;
+    }
 
     @ManyToOne
     @JoinColumn(name = "id_cliente", referencedColumnName = "id", nullable = false)
