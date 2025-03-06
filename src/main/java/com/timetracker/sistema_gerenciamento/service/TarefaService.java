@@ -95,15 +95,25 @@ public class TarefaService {
             throw new IllegalArgumentException("Horas inválidas. Deve ser um valor positivo.");
         }
 
+        // Adicionar tempo registrado
         tarefa.adicionarTempoRegistrado(horas);
-        tarefa.atualizarCustoRegistrado(tarefa.getTempoRegistrado());
+
+        // Calcular custo registrado uma única vez
+        BigDecimal custoRegistrado = tarefa.getValorPorHora().multiply(tarefa.getTempoRegistrado());
+        tarefa.setCustoRegistrado(custoRegistrado);
+
+        // Salvar a tarefa
+        Tarefa tarefaSalva = tarefaRepository.save(tarefa);
+
+        // Atualizar o custo do projeto
+        projetoService.atualizarCustoRegistradoProjeto(tarefa.getProjeto().getId());
 
         // Log for debugging
-        System.out.println("Tempo registrado: " + tarefa.getTempoRegistrado());
-        System.out.println("Valor por hora: " + tarefa.getValorPorHora());
-        System.out.println("Custo registrado: " + tarefa.getCustoRegistrado());
+        System.out.println("Tempo registrado: " + tarefaSalva.getTempoRegistrado());
+        System.out.println("Valor por hora: " + tarefaSalva.getValorPorHora());
+        System.out.println("Custo registrado: " + tarefaSalva.getCustoRegistrado());
 
-        return tarefaRepository.save(tarefa);
+        return tarefaSalva;
     }
 
     public BigDecimal calcularCustoTarefa(Tarefa tarefa) {

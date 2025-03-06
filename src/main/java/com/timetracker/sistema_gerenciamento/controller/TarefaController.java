@@ -4,6 +4,7 @@ import com.timetracker.sistema_gerenciamento.exception.ResourceNotFoundException
 import com.timetracker.sistema_gerenciamento.model.Tarefa;
 import com.timetracker.sistema_gerenciamento.model.Projeto;
 import com.timetracker.sistema_gerenciamento.repository.TarefaRepository;
+import com.timetracker.sistema_gerenciamento.service.ProjetoService;
 import com.timetracker.sistema_gerenciamento.service.TarefaService;
 import com.timetracker.sistema_gerenciamento.repository.ProjetoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,9 @@ public class TarefaController {
 
     @Autowired
     private ProjetoRepository projetoRepository;
+
+    @Autowired
+    private ProjetoService projetoService;
 
     @Autowired
     private TarefaRepository tarefaRepository;
@@ -142,5 +146,41 @@ public class TarefaController {
         System.out.println("Custo registrado: " + tarefaAtualizada.getCustoRegistrado());
 
         return ResponseEntity.ok(tarefaAtualizada);
+    }
+
+    @PutMapping("/projeto/{projetoId}/atualizar-custo")
+    public ResponseEntity<Map<String, Object>> atualizarCustoProjeto(@PathVariable Long projetoId) {
+        try {
+            Projeto projeto = projetoService.getProjetoById(projetoId);
+            if (projeto == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            // Calculando o custo total diretamente
+            BigDecimal custoTotal = BigDecimal.ZERO;
+            List<Tarefa> tarefas = tarefaRepository.findByProjetoId(projetoId);
+
+            for (Tarefa tarefa : tarefas) {
+                if (tarefa.getCustoRegistrado() != null) {
+                    custoTotal = custoTotal.add(tarefa.getCustoRegistrado());
+                }
+            }
+
+            // Atualizando o projeto
+            projeto.setCustoRegistrado(custoTotal);
+            projetoRepository.save(projeto);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("projetoId", projetoId);
+            response.put("custoRegistrado", custoTotal);
+            response.put("mensagem", "Custo do projeto atualizado com sucesso");
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("erro", "Falha ao atualizar custo: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
     }
 }

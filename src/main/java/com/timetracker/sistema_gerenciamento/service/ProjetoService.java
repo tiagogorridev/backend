@@ -183,13 +183,27 @@ public class ProjetoService {
 
     @Transactional
     public void atualizarCustoRegistradoProjeto(Long projetoId) {
-        Projeto projeto = getProjetoById(projetoId);
-        BigDecimal custoTotal = tarefaRepository.findByProjetoId(projetoId).stream()
-                .map(Tarefa::getCustoRegistrado)
-                .filter(custo -> custo != null)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        // Adicione logs para depuração
+        System.out.println("Iniciando atualização de custo para projeto: " + projetoId);
 
+        Projeto projeto = getProjetoById(projetoId);
+
+        List<Tarefa> tarefas = tarefaRepository.findByProjetoId(projetoId);
+        System.out.println("Tarefas encontradas: " + tarefas.size());
+
+        BigDecimal custoTotal = BigDecimal.ZERO;
+        for (Tarefa tarefa : tarefas) {
+            if (tarefa.getCustoRegistrado() != null) {
+                System.out.println("Tarefa ID: " + tarefa.getId() + ", Custo: " + tarefa.getCustoRegistrado());
+                custoTotal = custoTotal.add(tarefa.getCustoRegistrado());
+            }
+        }
+
+        System.out.println("Custo total calculado: " + custoTotal);
         projeto.setCustoRegistrado(custoTotal);
-        projetoRepository.save(projeto);
+
+        // Salve explicitamente
+        Projeto projetoSalvo = projetoRepository.save(projeto);
+        System.out.println("Projeto salvo com custo: " + projetoSalvo.getCustoRegistrado());
     }
 }

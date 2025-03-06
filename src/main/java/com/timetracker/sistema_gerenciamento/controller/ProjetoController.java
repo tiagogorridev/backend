@@ -154,6 +154,19 @@ public class ProjetoController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/{projetoId}/custo-registrado")
+    public ResponseEntity<BigDecimal> getCustoRegistrado(@PathVariable Long projetoId) {
+        Projeto projeto = projetoService.getProjetoById(projetoId);
+        if (projeto == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        projetoService.atualizarCustoRegistradoProjeto(projetoId);
+        projeto = projetoService.getProjetoById(projetoId);
+
+        return ResponseEntity.ok(projeto.getCustoRegistrado());
+    }
+
     @GetMapping("/getProjetos")
     public List<Projeto> getAllProjetos() {
         return projetoService.findAllProjetosAtivos();

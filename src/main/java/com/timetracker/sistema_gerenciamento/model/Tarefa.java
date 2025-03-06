@@ -67,12 +67,6 @@ public class Tarefa {
         this.custoRegistrado = custoRegistrado;
     }
 
-    public void atualizarCustoRegistrado(BigDecimal horasRegistradas) {
-        if (this.valorPorHora != null && horasRegistradas != null) {
-            this.custoRegistrado = this.valorPorHora.multiply(horasRegistradas);
-        }
-    }
-
     public LocalDateTime getDeletedAt() {
         return deletedAt;
     }
@@ -186,10 +180,20 @@ public class Tarefa {
         this.tempoRegistrado = tempoRegistrado;
     }
 
+    // Em Tarefa.java
     public void adicionarTempoRegistrado(BigDecimal horas) {
         if (this.tempoRegistrado == null) {
             this.tempoRegistrado = BigDecimal.ZERO;
         }
         this.tempoRegistrado = this.tempoRegistrado.add(horas);
+    }
+
+    public void atualizarCustoRegistrado(BigDecimal horasRegistradas) {
+        if (this.valorPorHora == null) {
+            this.custoRegistrado = BigDecimal.ZERO;
+            return;
+        }
+
+        this.custoRegistrado = this.valorPorHora.multiply(horasRegistradas);
     }
 }
