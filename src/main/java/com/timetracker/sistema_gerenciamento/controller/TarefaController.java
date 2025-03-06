@@ -109,9 +109,6 @@ public class TarefaController {
         Tarefa tarefa = tarefaRepository.findByIdAndProjetoId(idtarefa, idprojeto)
                 .orElseThrow(() -> new ResourceNotFoundException("Tarefa não encontrada"));
 
-        // Prevent manual setting of custoRegistrado
-        tarefaAtualizada.setCustoRegistrado(tarefa.getCustoRegistrado());
-
         tarefa.setNome(tarefaAtualizada.getNome());
         tarefa.setDescricao(tarefaAtualizada.getDescricao());
         tarefa.setDataInicio(tarefaAtualizada.getDataInicio());
