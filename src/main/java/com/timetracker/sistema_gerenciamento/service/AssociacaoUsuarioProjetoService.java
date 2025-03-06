@@ -79,4 +79,14 @@ public class AssociacaoUsuarioProjetoService {
     public List<UsuariosProjetos> listarTodasAssociacoes() {
         return usuariosProjetosRepository.findAll();
     }
+
+    public List<UsuariosProjetos> listarUsuariosProjetos() {
+        List<UsuariosProjetos> associacoes = usuariosProjetosRepository.findAll();
+
+        if (associacoes.isEmpty()) {
+            throw new RuntimeException("Nenhuma associação encontrada");
+        }
+
+        return associacoes;
+    }
 }

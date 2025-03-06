@@ -29,6 +29,15 @@ public class AssociacaoUsuarioProjetoController {
         }
     }
 
+    @GetMapping("/usuarios-projetos")
+    public ResponseEntity<?> listarUsuariosProjetos() {
+        try {
+            return ResponseEntity.ok(associacaoService.listarUsuariosProjetos());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
     @PostMapping("/{projetoId}/associar-usuario/{usuarioId}")
     public ResponseEntity<String> associarUsuarioAoProjeto(@PathVariable Long projetoId, @PathVariable Long usuarioId) {
         try {
