@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -88,5 +89,29 @@ public class AssociacaoUsuarioProjetoService {
         }
 
         return associacoes;
+    }
+
+    public List<String> listarEmailsUsuariosComProjetos() {
+        // Busca todas as associações com deletedAt nulo
+        List<UsuariosProjetos> associacoes = usuariosProjetosRepository.findAll()
+                .stream()
+                .filter(up -> up.getDeletedAt() == null)
+                .collect(Collectors.toList());
+
+        if (associacoes.isEmpty()) {
+            throw new RuntimeException("Nenhuma associação de usuário com projeto encontrada");
+        }
+
+        // Extrai IDs de usuários únicos das associações
+        Set<Long> idsUsuarios = associacoes.stream()
+                .map(UsuariosProjetos::getIdUsuario)
+                .collect(Collectors.toSet());
+
+        // Busca os usuários pelo ID e extrai os emails
+        return idsUsuarios.stream()
+                .map(id -> usuarioRepository.findById(id)
+                        .orElseThrow(() -> new RuntimeException("Usuário não encontrado com ID " + id)))
+                .map(Usuario::getEmail)
+                .collect(Collectors.toList());
     }
 }
