@@ -195,4 +195,10 @@ public class TarefaController {
         List<Tarefa> tarefas = tarefaService.listarTarefasPorUsuario(usuarioId);
         return ResponseEntity.ok(tarefas);
     }
+
+    @GetMapping("/projetos-usuario/{usuarioId}")
+    public ResponseEntity<List<Tarefa>> getTarefasPorProjetoDoUsuario(@PathVariable Long usuarioId) {
+        List<Tarefa> tarefas = tarefaService.listarTarefasPorProjetosDoUsuario(usuarioId);
+        return ResponseEntity.ok(tarefas);
+    }
 }

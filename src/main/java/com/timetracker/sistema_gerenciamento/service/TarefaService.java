@@ -134,4 +134,8 @@ public class TarefaService {
     public List<Tarefa> listarTarefasPorUsuario(Long usuarioId) {
         return tarefaRepository.findByUsuarioResponsavelId(usuarioId);
     }
+
+    public List<Tarefa> listarTarefasPorProjetosDoUsuario(Long usuarioId) {
+        return tarefaRepository.findByProjetosUsuarioId(usuarioId);
+    }
 }

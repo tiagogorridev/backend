@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.HashMap;
 import java.util.List;
@@ -90,6 +92,35 @@ public class UsuarioController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Erro ao atualizar usuário: " + e.getMessage()));
+        }
+    }
+
+    @GetMapping("/atual")
+    public ResponseEntity<?> getUsuarioAtual() {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null && authentication.isAuthenticated()) {
+                String email = authentication.getName();
+                Usuario usuarioAtual = usuarioService.buscarPorEmail(email);
+
+                if (usuarioAtual != null) {
+                    Map<String, Object> usuarioInfo = new HashMap<>();
+                    usuarioInfo.put("id", usuarioAtual.getId());
+                    usuarioInfo.put("nome", usuarioAtual.getNome());
+                    usuarioInfo.put("email", usuarioAtual.getEmail());
+                    usuarioInfo.put("perfil", usuarioAtual.getPerfil());
+                    usuarioInfo.put("dataCriacao", usuarioAtual.getDataCriacao());
+                    usuarioInfo.put("ultimoLogin", usuarioAtual.getUltimoLogin());
+                    usuarioInfo.put("ativo", usuarioAtual.getAtivo());
+
+                    return ResponseEntity.ok(usuarioInfo);
+                }
+            }
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Usuário não autenticado"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Erro ao obter usuário atual: " + e.getMessage()));
         }
     }
 
