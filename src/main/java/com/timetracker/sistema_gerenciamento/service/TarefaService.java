@@ -130,4 +130,8 @@ public class TarefaService {
     public void atualizarCustoProjetoEmNovaTransacao(Long projetoId) {
         projetoService.atualizarCustoRegistradoProjeto(projetoId);
     }
+
+    public List<Tarefa> listarTarefasPorUsuario(Long usuarioId) {
+        return tarefaRepository.findByUsuarioResponsavelId(usuarioId);
+    }
 }

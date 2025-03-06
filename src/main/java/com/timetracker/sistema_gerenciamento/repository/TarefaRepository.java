@@ -15,4 +15,8 @@ public interface TarefaRepository extends JpaRepository<Tarefa, Long> {
 
     @Query("SELECT t FROM Tarefa t WHERE t.id = ?1 AND t.projeto.id = ?2 AND t.deletedAt IS NULL")
     Optional<Tarefa> findByIdAndProjetoId(Long idTarefa, Long idProjeto);
+
+    @Query("SELECT t FROM Tarefa t WHERE t.usuarioResponsavel.id = ?1 AND t.deletedAt IS NULL")
+    List<Tarefa> findByUsuarioResponsavelId(Long usuarioId);
+
 }

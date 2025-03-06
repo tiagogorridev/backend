@@ -150,6 +150,8 @@ public class TarefaController {
         projetoService.atualizarCustoRegistradoProjeto(tarefaAtualizada.getProjeto().getId());
 
         return ResponseEntity.ok(tarefaAtualizada);
+
+
     }
 
     @PutMapping("/projeto/{projetoId}/atualizar-custo")
@@ -186,5 +188,11 @@ public class TarefaController {
             errorResponse.put("erro", "Falha ao atualizar custo: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
+    }
+
+    @GetMapping("/usuario/{usuarioId}")
+    public ResponseEntity<List<Tarefa>> listarTarefasPorUsuario(@PathVariable Long usuarioId) {
+        List<Tarefa> tarefas = tarefaService.listarTarefasPorUsuario(usuarioId);
+        return ResponseEntity.ok(tarefas);
     }
 }
