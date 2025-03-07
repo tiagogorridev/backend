@@ -44,6 +44,14 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
+            Usuario usuario = usuarioService.buscarPorEmail(request.getEmail());
+
+            // Verifique se o usuário está ativo
+            if (usuario.getAtivo() == Usuario.AtivoStatus.INATIVO) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("message", "Usuário inativo. Não é possível realizar login."));
+            }
+
             UsernamePasswordAuthenticationToken authenticationToken =
                     new UsernamePasswordAuthenticationToken(request.getEmail(), request.getSenha());
             authenticationManager.authenticate(authenticationToken);
@@ -51,8 +59,6 @@ public class AuthController {
 
             UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
             String token = jwtUtil.generateToken(userDetails.getUsername());
-
-            Usuario usuario = usuarioService.buscarPorEmail(request.getEmail());
 
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Login bem-sucedido");
