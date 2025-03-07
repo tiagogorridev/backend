@@ -105,6 +105,16 @@ public class LancamentoHorasController {
         return ResponseEntity.ok(hasOverlap);
     }
 
+    @GetMapping
+    public ResponseEntity<List<LancamentoHoras>> getTodosLancamentos() {
+        try {
+            List<LancamentoHoras> lancamentos = lancamentoHorasService.findAll();
+            return ResponseEntity.ok(lancamentos);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
     // When saving a new time entry, add an overlap check
     @PostMapping
     public ResponseEntity<?> salvarLancamento(@RequestBody LancamentoHorasDTO lancamentoHorasDTO) {

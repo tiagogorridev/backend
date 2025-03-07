@@ -132,4 +132,8 @@ public class LancamentoHorasService {
         System.out.println("Final overlap result: " + hasOverlap);
         return hasOverlap;
     }
+
+    public List<LancamentoHoras> findAll() {
+        return lancamentoHorasRepository.findAll();
+    }
 }
