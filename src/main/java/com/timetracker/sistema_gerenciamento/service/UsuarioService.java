@@ -102,4 +102,18 @@ public class UsuarioService {
         usuario.setDeletedAt(LocalDateTime.now());
         usuarioRepository.save(usuario);
     }
+
+    public List<Usuario> listarUsuariosInativos() {
+        return usuarioRepository.findByAtivo(Usuario.AtivoStatus.INATIVO);
+    }
+
+    public void reativarUsuario(Long id) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new UsuarioNaoEncontradoException(id));
+
+        usuario.setDeletedAt(null);
+        usuario.setAtivo(Usuario.AtivoStatus.ATIVO);
+
+        usuarioRepository.save(usuario);
+    }
 }

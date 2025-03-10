@@ -201,4 +201,24 @@ public class UsuarioController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
+    @GetMapping("/inativos")
+    public ResponseEntity<List<Usuario>> listarUsuariosInativos() {
+        List<Usuario> usuariosInativos = usuarioService.listarUsuariosInativos();
+        return ResponseEntity.ok(usuariosInativos);
+    }
+
+    @PatchMapping("/{id}/reativar")
+    public ResponseEntity<?> reativarUsuario(@PathVariable Long id) {
+        try {
+            usuarioService.reativarUsuario(id);
+            return ResponseEntity.ok(Map.of("message", "Usuário reativado com sucesso"));
+        } catch (UsuarioNaoEncontradoException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "Usuário não encontrado"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Erro ao reativar usuário: " + e.getMessage()));
+        }
+    }
 }
