@@ -43,15 +43,21 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/swagger-resources/**",
+                                "/webjars/**"
+                        ).permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/usuarios/cadastro").permitAll()
                         .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                         .requestMatchers("/api/user/**").hasAuthority("USUARIO")
                         .requestMatchers("/email/send").authenticated()
                         .requestMatchers("/api/**").authenticated()
-                        .requestMatchers("/api/lancamento/**").authenticated()  // Garante que o endpoint está protegido
+                        .requestMatchers("/api/lancamento/**").authenticated()
 
-// qualquer usuário autenticado
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

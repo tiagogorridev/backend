@@ -10,5 +10,4 @@ import java.util.List;
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     Usuario findByEmail(String email);
     List<Usuario> findByAtivo(Usuario.AtivoStatus ativo);
-
 }
