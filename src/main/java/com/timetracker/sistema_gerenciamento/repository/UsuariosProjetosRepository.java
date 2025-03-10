@@ -1,6 +1,7 @@
 package com.timetracker.sistema_gerenciamento.repository;
 
 import com.timetracker.sistema_gerenciamento.model.Projeto;
+import com.timetracker.sistema_gerenciamento.model.Usuario;
 import com.timetracker.sistema_gerenciamento.model.UsuariosProjetos;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -27,4 +28,12 @@ public interface UsuariosProjetosRepository extends JpaRepository<UsuariosProjet
 
     @Query("SELECT p FROM Projeto p JOIN p.usuarios u WHERE u.id = :usuarioId")
     List<Projeto> findProjetosByUsuarioId(@Param("usuarioId") Long usuarioId);
+
+    @Query("SELECT u FROM Usuario u " +
+            "JOIN UsuariosProjetos up ON u.id = up.idUsuario " +
+            "WHERE up.idProjeto = :projetoId " +
+            "AND up.deletedAt IS NULL " +
+            "AND u.ativo = 'ATIVO' " +
+            "AND u.deletedAt IS NULL")
+    List<Usuario> findActiveUsersByProjectId(@Param("projetoId") Long projetoId);
 }

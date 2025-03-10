@@ -47,13 +47,7 @@ public class AssociacaoUsuarioProjetoService {
 
 
     public List<Usuario> getMembrosProjetoPorId(Long projetoId) {
-        List<UsuariosProjetos> associacoes = usuariosProjetosRepository
-                .findByIdProjeto(projetoId);
-
-        return associacoes.stream()
-                .map(associacao -> usuarioRepository.findById(associacao.getIdUsuario())
-                        .orElseThrow(() -> new RuntimeException("Usuário não encontrado")))
-                .collect(Collectors.toList());
+        return usuariosProjetosRepository.findActiveUsersByProjectId(projetoId);
     }
 
     public List<Projeto> getProjetosAssociados(Long usuarioId) {
