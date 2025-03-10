@@ -23,6 +23,23 @@ public class ClienteController {
         return ResponseEntity.ok(clientes);
     }
 
+    @GetMapping("/inativos")
+    public ResponseEntity<List<Cliente>> listarClientesInativos() {
+        List<Cliente> clientesInativos = clienteService.listarClientesInativos();
+        return ResponseEntity.ok(clientesInativos);
+    }
+
+    @PatchMapping("/{id}/reativar")
+    public ResponseEntity<?> reativarCliente(@PathVariable Long id) {
+        try {
+            clienteService.reativarCliente(id);
+            return ResponseEntity.ok(Map.of("message", "Cliente reativado com sucesso"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Erro ao reativar cliente: " + e.getMessage()));
+        }
+    }
+
     @PostMapping
     public ResponseEntity<?> cadastrarCliente(@RequestBody Cliente cliente) {
         try {

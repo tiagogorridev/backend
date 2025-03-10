@@ -47,7 +47,6 @@ public class ClienteService {
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
     }
 
-
     public void softDeleteCliente(Long id) {
         Cliente cliente = clienteRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
@@ -55,6 +54,20 @@ public class ClienteService {
         cliente.setDeletedAt(LocalDateTime.now());
 
         cliente.setStatus("INATIVO");
+
+        clienteRepository.save(cliente);
+    }
+
+    public List<Cliente> listarClientesInativos() {
+        return clienteRepository.findByStatus("INATIVO");
+    }
+
+    public void reativarCliente(Long id) {
+        Cliente cliente = clienteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+
+        cliente.setDeletedAt(null);
+        cliente.setStatus("ATIVO");
 
         clienteRepository.save(cliente);
     }
