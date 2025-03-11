@@ -4,6 +4,11 @@ import com.timetracker.sistema_gerenciamento.DTO.LancamentoHorasDTO;
 import com.timetracker.sistema_gerenciamento.DTO.TimeEntryOverlapRequest;
 import com.timetracker.sistema_gerenciamento.model.LancamentoHoras;
 import com.timetracker.sistema_gerenciamento.service.LancamentoHorasService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,11 +20,17 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/lancamento")
+@Tag(name = "Lançamento de Horas", description = "APIs para gerenciamento de lançamentos de horas")
+
 public class LancamentoHorasController {
     @Autowired
     private LancamentoHorasService lancamentoHorasService;
 
-
+    @Operation(summary = "Listar lançamentos por usuário", description = "Retorna todos os lançamentos de horas de um usuário específico")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lançamentos encontrados com sucesso"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor", content = @Content)
+    })
     @GetMapping("/usuario/{usuarioId}")
     public ResponseEntity<List<LancamentoHoras>> getLancamentosByUsuario(@PathVariable Long usuarioId) {
         try {
@@ -30,6 +41,11 @@ public class LancamentoHorasController {
         }
     }
 
+    @Operation(summary = "Listar lançamentos em análise", description = "Retorna todos os lançamentos de horas com status 'EM_ANALISE'")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lançamentos encontrados com sucesso"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor", content = @Content)
+    })
     @GetMapping("/em-analise")
     public ResponseEntity<List<LancamentoHoras>> getLancamentosEmAnalise() {
         try {
@@ -40,6 +56,11 @@ public class LancamentoHorasController {
         }
     }
 
+    @Operation(summary = "Aprovar lançamento", description = "Atualiza o status de um lançamento de horas para 'APROVADO'")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lançamento aprovado com sucesso"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor", content = @Content)
+    })
     @PutMapping("/aprovar/{lancamentoId}")
     public ResponseEntity<LancamentoHoras> aprovarLancamento(@PathVariable Long lancamentoId) {
         try {
@@ -50,6 +71,11 @@ public class LancamentoHorasController {
         }
     }
 
+    @Operation(summary = "Rejeitar lançamento", description = "Atualiza o status de um lançamento de horas para 'REPROVADO'")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lançamento rejeitado com sucesso"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor", content = @Content)
+    })
     @PutMapping("/rejeitar/{lancamentoId}")
     public ResponseEntity<LancamentoHoras> rejeitarLancamento(@PathVariable Long lancamentoId) {
         try {
@@ -60,6 +86,11 @@ public class LancamentoHorasController {
         }
     }
 
+    @Operation(summary = "Atualizar status de lançamento", description = "Atualiza o status de um lançamento de horas para o valor fornecido")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Status atualizado com sucesso"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor", content = @Content)
+    })
     @PutMapping("/{lancamentoId}/status")
     public ResponseEntity<LancamentoHoras> atualizarStatus(
             @PathVariable Long lancamentoId,
@@ -84,7 +115,10 @@ public class LancamentoHorasController {
         }
     }
 
-
+    @Operation(summary = "Verificar sobreposição de horários", description = "Verifica se existe sobreposição de horários para um usuário em uma data e período específicos")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Verificação realizada com sucesso")
+    })
     @PostMapping("/check-overlap")
     public ResponseEntity<Boolean> checkTimeOverlap(@RequestBody TimeEntryOverlapRequest request) {
         // Add logging
@@ -105,6 +139,11 @@ public class LancamentoHorasController {
         return ResponseEntity.ok(hasOverlap);
     }
 
+    @Operation(summary = "Listar todos os lançamentos", description = "Retorna todos os lançamentos de horas cadastrados no sistema")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lançamentos listados com sucesso"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor", content = @Content)
+    })
     @GetMapping
     public ResponseEntity<List<LancamentoHoras>> getTodosLancamentos() {
         try {
@@ -115,8 +154,12 @@ public class LancamentoHorasController {
         }
     }
 
-    // When saving a new time entry, add an overlap check
-    @PostMapping
+    @Operation(summary = "Salvar lançamento de horas", description = "Registra um novo lançamento de horas, verificando a existência de sobreposição de horários")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lançamento salvo com sucesso"),
+            @ApiResponse(responseCode = "409", description = "Conflito - Já existe um lançamento no período informado", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Requisição inválida", content = @Content)
+    })    @PostMapping
     public ResponseEntity<?> salvarLancamento(@RequestBody LancamentoHorasDTO lancamentoHorasDTO) {
         try {
             // Convert DTO data to appropriate types for overlap check

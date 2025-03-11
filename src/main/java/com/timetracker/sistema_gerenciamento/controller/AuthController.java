@@ -4,6 +4,11 @@ import com.timetracker.sistema_gerenciamento.model.Usuario;
 import com.timetracker.sistema_gerenciamento.security.JwtUtil;
 import com.timetracker.sistema_gerenciamento.service.UsuarioService;
 import com.timetracker.sistema_gerenciamento.security.TokenBlacklistService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -21,6 +26,9 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = "http://localhost:4200")
+@Tag(name = "Autenticação", description = "APIs para autenticação de usuários")
+
+
 public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
@@ -41,6 +49,13 @@ public class AuthController {
         this.tokenBlacklistService = tokenBlacklistService;
     }
 
+    @Operation(summary = "Autenticar usuário", description = "Realiza o login do usuário e retorna um token JWT")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Login realizado com sucesso"),
+            @ApiResponse(responseCode = "401", description = "Credenciais inválidas", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Usuário inativo", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor", content = @Content)
+    })
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
@@ -76,6 +91,11 @@ public class AuthController {
         }
     }
 
+    @Operation(summary = "Encerrar sessão", description = "Realiza o logout do usuário e invalida o token JWT")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Logout realizado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Token não encontrado", content = @Content)
+    })
     @PostMapping("/logout")
     public ResponseEntity<String> logout(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
