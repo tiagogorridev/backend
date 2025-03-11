@@ -1,4 +1,4 @@
-package com.timetracker.sistema_gerenciamento.security;
+package com.timetracker.sistema_gerenciamento.config;
 
 import com.timetracker.sistema_gerenciamento.model.Usuario;
 import com.timetracker.sistema_gerenciamento.repository.UsuarioRepository;
