@@ -5,6 +5,9 @@ import com.timetracker.sistema_gerenciamento.model.Projeto;
 import com.timetracker.sistema_gerenciamento.model.Usuario;
 import com.timetracker.sistema_gerenciamento.service.AssociacaoUsuarioProjetoService;
 import com.timetracker.sistema_gerenciamento.service.UsuarioService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +24,8 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/usuarios")
 @CrossOrigin(origins = "http://localhost:4200")
+@Tag(name = "Usuários", description = "Gerenciamento de usuários")
+
 public class UsuarioController {
 
     @Autowired
@@ -29,12 +34,18 @@ public class UsuarioController {
     @Autowired
     private AssociacaoUsuarioProjetoService associacaoUsuarioProjetoService;
 
+    @Operation(summary = "Listar todos os usuários", description = "Obtém todos os usuários cadastrados no sistema.")
+    @ApiResponse(responseCode = "200", description = "Usuários encontrados")
     @GetMapping
     public ResponseEntity<List<Usuario>> listarTodosUsuarios() {
         List<Usuario> usuarios = usuarioService.listarTodosUsuarios();
         return ResponseEntity.ok(usuarios);
     }
 
+    @Operation(summary = "Cadastrar um novo usuário", description = "Cadastra um novo usuário no sistema, se o email não estiver em uso.")
+    @ApiResponse(responseCode = "201", description = "Usuário cadastrado com sucesso")
+    @ApiResponse(responseCode = "400", description = "Email já cadastrado")
+    @ApiResponse(responseCode = "500", description = "Erro ao cadastrar usuário")
     @PostMapping("/cadastro")
     public ResponseEntity<?> cadastrarUsuario(@RequestBody Usuario usuario) {
         try {
@@ -58,6 +69,8 @@ public class UsuarioController {
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Operation(summary = "Listar emails dos usuários ativos", description = "Retorna uma lista com os emails dos usuários ativos.")
+    @ApiResponse(responseCode = "200", description = "Emails encontrados")
     @GetMapping("/emails")
     public ResponseEntity<List<String>> getEmails() {
         List<String> emails = usuarioService.listarUsuariosAtivos().stream()
@@ -66,6 +79,9 @@ public class UsuarioController {
         return ResponseEntity.ok(emails);
     }
 
+    @Operation(summary = "Atualizar um usuário", description = "Atualiza as informações de um usuário específico.")
+    @ApiResponse(responseCode = "200", description = "Usuário atualizado com sucesso")
+    @ApiResponse(responseCode = "500", description = "Erro ao atualizar usuário")
     @PutMapping("/usuarios/{id}")
     public ResponseEntity<?> atualizarUsuario(@PathVariable Long id, @RequestBody Map<String, Object> requestBody) {
         try {
@@ -94,6 +110,9 @@ public class UsuarioController {
         }
     }
 
+    @Operation(summary = "Obter o usuário atual", description = "Obtém as informações do usuário logado.")
+    @ApiResponse(responseCode = "200", description = "Informações do usuário atual")
+    @ApiResponse(responseCode = "401", description = "Usuário não autenticado")
     @GetMapping("/atual")
     public ResponseEntity<?> getUsuarioAtual() {
         try {
@@ -123,6 +142,9 @@ public class UsuarioController {
         }
     }
 
+    @Operation(summary = "Obter usuário por ID", description = "Retorna os detalhes de um usuário pelo seu ID.")
+    @ApiResponse(responseCode = "200", description = "Usuário encontrado")
+    @ApiResponse(responseCode = "500", description = "Erro ao buscar usuário")
     @GetMapping("/usuarios/{id}")
     public ResponseEntity<?> getUsuarioById(@PathVariable Long id) {
         try {
@@ -135,6 +157,9 @@ public class UsuarioController {
         }
     }
 
+    @Operation(summary = "Verificar senha atual", description = "Verifica se a senha informada corresponde à senha atual do usuário.")
+    @ApiResponse(responseCode = "200", description = "Senha verificada com sucesso")
+    @ApiResponse(responseCode = "500", description = "Erro ao verificar senha")
     @PostMapping("/usuarios/{id}/verify-password")
     public ResponseEntity<?> verificarSenhaAtual(@PathVariable Long id, @RequestBody Map<String, String> credentials) {
         try {
@@ -146,6 +171,9 @@ public class UsuarioController {
         }
     }
 
+    @Operation(summary = "Obter ID do usuário por email", description = "Obtém o ID do usuário a partir do seu email.")
+    @ApiResponse(responseCode = "200", description = "ID do usuário encontrado")
+    @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
     @GetMapping("/by-email")
     public ResponseEntity<Long> getUserIdByEmail(@RequestParam String email) {
         try {
@@ -159,6 +187,10 @@ public class UsuarioController {
         }
     }
 
+    @Operation(summary = "Excluir um usuário", description = "Exclui um usuário do sistema.")
+    @ApiResponse(responseCode = "200", description = "Usuário excluído com sucesso")
+    @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
+    @ApiResponse(responseCode = "500", description = "Erro ao excluir usuário")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> excluirUsuario(@PathVariable Long id) {
         try {
@@ -173,12 +205,18 @@ public class UsuarioController {
         }
     }
 
+    @Operation(summary = "Listar usuários inativos", description = "Obtém uma lista de usuários que estão inativos.")
+    @ApiResponse(responseCode = "200", description = "Usuários inativos encontrados")
     @GetMapping("/inativos")
     public ResponseEntity<List<Usuario>> listarUsuariosInativos() {
         List<Usuario> usuariosInativos = usuarioService.listarUsuariosInativos();
         return ResponseEntity.ok(usuariosInativos);
     }
 
+    @Operation(summary = "Reativar um usuário", description = "Reativa um usuário que estava inativo.")
+    @ApiResponse(responseCode = "200", description = "Usuário reativado com sucesso")
+    @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
+    @ApiResponse(responseCode = "500", description = "Erro ao reativar usuário")
     @PatchMapping("/{id}/reativar")
     public ResponseEntity<?> reativarUsuario(@PathVariable Long id) {
         try {
