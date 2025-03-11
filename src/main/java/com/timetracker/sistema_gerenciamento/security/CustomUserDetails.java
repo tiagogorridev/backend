@@ -17,7 +17,15 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
+        // Usar o perfil do usuário em vez de hardcoded "ROLE_USER"
+        String perfil = usuario.getPerfil();
+        if (perfil == null || perfil.isEmpty()) {
+            perfil = "USER"; // Valor padrão
+        }
+
+        // Adicionar prefixo ROLE_ se não estiver presente
+        String roleName = perfil.startsWith("ROLE_") ? perfil : "ROLE_" + perfil;
+        return Collections.singletonList(new SimpleGrantedAuthority(roleName));
     }
 
     @Override

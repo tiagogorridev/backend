@@ -28,7 +28,7 @@ public class DataInitializer implements CommandLineRunner {
             admin.setNome("Administrador");
             admin.setEmail("admin@gmail.com");
             admin.setSenha(passwordEncoder.encode("admin123"));
-            admin.setPerfil("ADMIN");
+            admin.setPerfil("ADMIN"); // Sem o prefixo ROLE_
             admin.setAtivo(Usuario.AtivoStatus.ATIVO);
             admin.setDataCriacao(LocalDateTime.now());
 
@@ -37,6 +37,22 @@ public class DataInitializer implements CommandLineRunner {
             System.out.println("Usuário administrador criado com sucesso!");
         } else {
             System.out.println("Usuário administrador já existe.");
+        }
+
+        if (usuarioRepository.findByEmail("usuario@gmail.com") == null) {
+            Usuario usuario = new Usuario();
+            usuario.setNome("Usuário Comum");
+            usuario.setEmail("usuario@gmail.com");
+            usuario.setSenha(passwordEncoder.encode("usuario123"));
+            usuario.setPerfil("USUARIO"); // Sem o prefixo ROLE_
+            usuario.setAtivo(Usuario.AtivoStatus.ATIVO);
+            usuario.setDataCriacao(LocalDateTime.now());
+
+            usuarioRepository.save(usuario);
+
+            System.out.println("Usuário comum criado com sucesso!");
+        } else {
+            System.out.println("Usuário comum já existe.");
         }
     }
 }
