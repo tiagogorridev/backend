@@ -23,11 +23,11 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (usuarioRepository.findByEmail("admin@gmail.com") == null) {
+        if (usuarioRepository.findByEmail("tiagogorri@gmail.com") == null) {
             Usuario admin = new Usuario();
-            admin.setNome("Nome do Administrador");
-            admin.setEmail("admin@gmail.com");
-            admin.setSenha(passwordEncoder.encode("admin123"));
+            admin.setNome("Tiago Kasprzak Gorri");
+            admin.setEmail("tiagogorri@gmail.com");
+            admin.setSenha(passwordEncoder.encode("tiago123"));
             admin.setPerfil("ADMIN"); // Sem o prefixo ROLE_
             admin.setAtivo(Usuario.AtivoStatus.ATIVO);
             admin.setDataCriacao(LocalDateTime.now());
@@ -39,11 +39,11 @@ public class DataInitializer implements CommandLineRunner {
             System.out.println("Usuário administrador já existe.");
         }
 
-        if (usuarioRepository.findByEmail("usuario@gmail.com") == null) {
+        if (usuarioRepository.findByEmail("pedrosilva@gmail.com") == null) {
             Usuario usuario = new Usuario();
-            usuario.setNome("Nome do Usuário");
-            usuario.setEmail("usuario@gmail.com");
-            usuario.setSenha(passwordEncoder.encode("usuario123"));
+            usuario.setNome("Pedro Silva");
+            usuario.setEmail("pedrosilva@gmail.com");
+            usuario.setSenha(passwordEncoder.encode("pedro123"));
             usuario.setPerfil("USUARIO"); // Sem o prefixo ROLE_
             usuario.setAtivo(Usuario.AtivoStatus.ATIVO);
             usuario.setDataCriacao(LocalDateTime.now());
