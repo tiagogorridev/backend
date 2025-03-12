@@ -25,7 +25,7 @@ public class DataInitializer implements CommandLineRunner {
     public void run(String... args) {
         if (usuarioRepository.findByEmail("admin@gmail.com") == null) {
             Usuario admin = new Usuario();
-            admin.setNome("Administrador");
+            admin.setNome("Nome do Administrador");
             admin.setEmail("admin@gmail.com");
             admin.setSenha(passwordEncoder.encode("admin123"));
             admin.setPerfil("ADMIN"); // Sem o prefixo ROLE_
@@ -41,7 +41,7 @@ public class DataInitializer implements CommandLineRunner {
 
         if (usuarioRepository.findByEmail("usuario@gmail.com") == null) {
             Usuario usuario = new Usuario();
-            usuario.setNome("Usuário Comum");
+            usuario.setNome("Nome do Usuário");
             usuario.setEmail("usuario@gmail.com");
             usuario.setSenha(passwordEncoder.encode("usuario123"));
             usuario.setPerfil("USUARIO"); // Sem o prefixo ROLE_
