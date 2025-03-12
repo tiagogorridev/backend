@@ -68,7 +68,6 @@ public class UsuarioController {
         }
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Operation(summary = "Listar emails dos usuários ativos", description = "Retorna uma lista com os emails dos usuários ativos.")
     @ApiResponse(responseCode = "200", description = "Emails encontrados")
     @GetMapping("/emails")
