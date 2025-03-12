@@ -57,7 +57,8 @@ public class SecurityConfig {
                         .requestMatchers("/email/send").authenticated()
                         .requestMatchers("/api/**").authenticated()
                         .requestMatchers("/api/lancamento/**").authenticated()
-
+                        .requestMatchers("/health").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
