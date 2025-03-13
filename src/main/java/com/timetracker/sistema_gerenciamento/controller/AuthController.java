@@ -25,7 +25,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "https://sistema-horas-a6e4955506b7.herokuapp.com")
 @Tag(name = "Autenticação", description = "APIs para autenticação de usuários")
 
 
