@@ -50,6 +50,11 @@ public class SecurityConfig {
                                 "/swagger-resources/**",
                                 "/webjars/**"
                         ).permitAll()
+                        .requestMatchers(
+                                "https://sistema-horas-front.herokuapp.com",
+                                "http://localhost:4200",
+                                "https://sistema-horas-front-c24bebf44baf.herokuapp.com"
+                        ).permitAll()
                         .requestMatchers("/").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/usuarios/cadastro").permitAll()
