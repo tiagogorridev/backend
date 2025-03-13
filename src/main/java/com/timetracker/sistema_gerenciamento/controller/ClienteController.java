@@ -41,6 +41,7 @@ public class ClienteController {
     })
     @PostMapping
     public ResponseEntity<?> cadastrarCliente(@RequestBody Cliente cliente) {
+        System.out.println("Dados recebidos: " + cliente);  // Adicionando log
         try {
             if (cliente == null || cliente.getEmail() == null || cliente.getEmail().trim().isEmpty()) {
                 return ResponseEntity.badRequest()
